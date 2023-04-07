@@ -1,3 +1,4 @@
+import sys
 import shutil
 import os
 import re
@@ -85,7 +86,8 @@ def parseScript(folderName, line):
 def TxtToLua(txtFileName):
     with open(txtFileName, 'r', encoding='utf-8') as txt:
         folderName = txtFileName.replace('.txt', '')
-        shutil.rmtree(folderName)
+        if os.path.exists(folderName):
+            shutil.rmtree(folderName)
         os.mkdir(folderName)
         for line in txt:
             line = line.replace('\\"', doubleQuot)
@@ -100,4 +102,4 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-ModToLua('input.mod')
+ModToLua(sys.argv[2])
