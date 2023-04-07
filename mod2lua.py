@@ -102,4 +102,4 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-ModToLua(sys.argv[2])
+ModToLua(sys.argv[1])
