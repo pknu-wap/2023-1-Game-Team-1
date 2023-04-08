@@ -19,7 +19,7 @@ def ModToTxt(modFileName):
 
 
 def parseProperties(properties):
-    content = '[Properties]\n\n'
+    content = ''
 
     for property in re.findall('{.*?}', properties):
         type = re.search('"Type":"(.*?)"', property).group(1)
@@ -30,7 +30,7 @@ def parseProperties(properties):
             value = value.replace('|', ', ')
             type += '<'+value+'>'
             value = ''
-        elif type == "Entity":
+        elif type == "Entity" or type == "Component":
             value = ''
         else:
             value = '= '+value
@@ -41,7 +41,7 @@ def parseProperties(properties):
 
 
 def parseMethods(methods):
-    content = '\n\n[Methods]\n\n'
+    content = '\n\n'
 
     for method in re.findall('{"Return".*?"Scope".*?}', methods):
         type = re.search('"Type":"(.*?)"', method).group(1)
@@ -57,11 +57,24 @@ def parseMethods(methods):
             arguments = arguments.replace(', ', '', 1)
 
         code = re.search('"Code":"(.*?)"', method).group(1)
-        code = tab + code
         code = code.replace(newline, newline+tab)
 
         content += type + ' ' + name + \
-            '('+arguments+') {\n' + code + '\n}\n\n\n'
+            '(' + arguments + ')\n{\n' + tab + code + '\n}\n\n\n'
+
+    return content
+
+
+def parseEvents(events):
+    content = '\n\n'
+
+    for event in re.findall('{"Name".*?"ExecSpace".*?}', events):
+        type = re.search('"Name":"(.*?)"', event).group(1)
+        argType = re.search('"EventName":"(.*?)"', event).group(1)
+        code = re.search('"Code":"(.*?)"', event).group(1)
+        code = code.replace(newline, newline+tab)
+        content += type + \
+            '('+argType+' event)\n{\n' + tab + code + '\n}\n\n\n'
 
     return content
 
@@ -74,6 +87,9 @@ def parseScript(folderName, line):
 
     methods = re.search('"Methods".*"EntityEventHandlers"', line).group(0)
     content += parseMethods(methods)
+
+    events = re.search('"EntityEventHandlers".*', line).group(0)
+    content += parseEvents(events)
 
     content = content.replace(doubleQuot, '"')
     content = content.replace(newline, '\n')
@@ -102,4 +118,5 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-ModToLua(sys.argv[1])
+# ModToLua(sys.argv[1])
+ModToLua("inventory_test.mod")
