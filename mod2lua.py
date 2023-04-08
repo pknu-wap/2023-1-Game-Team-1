@@ -63,7 +63,7 @@ def parseMethods(methods):
         code = code.replace(newline, newline+tab)
 
         content += '[' + execSpace[int(space)] + ']\n' + type + ' ' + name + \
-            '(' + arguments + ')\n{\n' + tab + code + '\n}\n\n\n'
+            '(' + arguments + ')\n{\n' + tab + code + '\n}\n'
 
     return content
 
@@ -78,7 +78,7 @@ def parseEvents(events):
         code = re.search('"Code":"(.*?)"', event).group(1)
         code = code.replace(newline, newline+tab)
         content += '[' + execSpace[int(space)] + ']\n' + type + \
-            '('+argType+' event)\n{\n' + tab + code + '\n}\n\n\n'
+            '('+argType+' event)\n{\n' + tab + code + '\n}\n'
 
     return content
 
