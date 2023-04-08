@@ -99,7 +99,7 @@ def parseScript(folderName, line):
     content = content.replace(newline, '\n')
     content = content.replace(tab, '\t')
 
-    with open(folderName+'/'+scriptName+'.lua', 'w', encoding="utf-16") as script:
+    with open(folderName+'/'+scriptName+'.lua', 'w', encoding="utf-8") as script:
         script.write(content)
 
 
