@@ -63,13 +63,13 @@ def parseMethods(methods):
         code = code.replace(newline, newline+tab)
 
         content += '[' + execSpace[int(space)] + ']\n' + type + ' ' + name + \
-            '(' + arguments + ')\n{\n' + tab + code + '\n}\n'
+            '(' + arguments + ')\n{\n' + tab + code + '\n}\n\n'
 
     return content
 
 
 def parseEvents(events):
-    content = '\n\n--Events--\n\n'
+    content = '\n--Events--\n\n'
 
     for event in re.findall('{"Name".*?"ExecSpace".*?}', events):
         space = re.search('"ExecSpace":(.*?)}', event).group(1)
