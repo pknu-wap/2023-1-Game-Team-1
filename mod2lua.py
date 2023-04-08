@@ -21,7 +21,7 @@ def ModToTxt(modFileName):
 
 
 def parseProperties(properties):
-    content = ''
+    content = '--Properties--\n\n'
 
     for property in re.findall('{.*?}', properties):
         type = re.search('"Type":"(.*?)"', property).group(1)
@@ -43,7 +43,7 @@ def parseProperties(properties):
 
 
 def parseMethods(methods):
-    content = '\n\n'
+    content = '\n\n--Methods--\n\n'
 
     for method in re.findall('{"Return".*?"Scope".*?}', methods):
         space = re.search('"ExecSpace":(.*?),', method).group(1)
@@ -69,7 +69,7 @@ def parseMethods(methods):
 
 
 def parseEvents(events):
-    content = '\n\n'
+    content = '\n\n--Events--\n\n'
 
     for event in re.findall('{"Name".*?"ExecSpace".*?}', events):
         space = re.search('"ExecSpace":(.*?)}', event).group(1)
@@ -122,5 +122,4 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-# ModToLua(sys.argv[1])
-ModToLua("inventory_test.mod")
+ModToLua(sys.argv[1])
