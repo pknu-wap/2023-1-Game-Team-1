@@ -6,6 +6,8 @@ import re
 doubleQuot = 'TMP_DOUBLE_QUOT'
 newline = 'TMP_NEWLINE'
 tab = 'TMP_TAB'
+execSpace = ['Default', 'Server Only', 'Client Only', 'Unknown Space 3',
+             'Unknown Space 4', 'Server', 'Client', 'Unknown Space 7', 'Unknown Space 8', 'Multicast']
 
 
 def ModToTxt(modFileName):
@@ -44,6 +46,7 @@ def parseMethods(methods):
     content = '\n\n'
 
     for method in re.findall('{"Return".*?"Scope".*?}', methods):
+        space = re.search('"ExecSpace":(.*?),', method).group(1)
         type = re.search('"Type":"(.*?)"', method).group(1)
         name = re.search('"Scope".*?"Name":"(.*?)"', method).group(1)
         arguments = ""
@@ -59,7 +62,7 @@ def parseMethods(methods):
         code = re.search('"Code":"(.*?)"', method).group(1)
         code = code.replace(newline, newline+tab)
 
-        content += type + ' ' + name + \
+        content += '[' + execSpace[int(space)] + ']\n' + type + ' ' + name + \
             '(' + arguments + ')\n{\n' + tab + code + '\n}\n\n\n'
 
     return content
@@ -69,11 +72,12 @@ def parseEvents(events):
     content = '\n\n'
 
     for event in re.findall('{"Name".*?"ExecSpace".*?}', events):
+        space = re.search('"ExecSpace":(.*?)}', event).group(1)
         type = re.search('"Name":"(.*?)"', event).group(1)
         argType = re.search('"EventName":"(.*?)"', event).group(1)
         code = re.search('"Code":"(.*?)"', event).group(1)
         code = code.replace(newline, newline+tab)
-        content += type + \
+        content += '[' + execSpace[int(space)] + ']\n' + type + \
             '('+argType+' event)\n{\n' + tab + code + '\n}\n\n\n'
 
     return content
