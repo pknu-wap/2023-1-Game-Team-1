@@ -35,9 +35,9 @@ def parseProperties(properties):
         elif type == "Entity" or type == "Component":
             value = ''
         else:
-            value = '= '+value
+            value = ' = '+value
 
-        content += type+' '+name+' '+value+'\n'
+        content += type + ' ' + name + value + '\n'
 
     return content
 

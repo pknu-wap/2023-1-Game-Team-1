@@ -1,7 +1,7 @@
 --Properties--
 
-Component message 
-Entity toastGroup 
+Component message
+Entity toastGroup
 number duration = 2
 number tweenDuration = 0.1
 number tweenEventId = 0

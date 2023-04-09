@@ -4,10 +4,10 @@ number slotCnt = 30
 string itemsDataSet = "ItemsDataSet"
 string equipsDataSet = "EquipsDataSet"
 string userId = ""
-dictionary<string, string> itemImg 
-array<SpriteGUIRendererComponent> sprites 
-array<TextComponent> texts 
-Entity itemSlot 
+dictionary<string, string> itemImg
+array<SpriteGUIRendererComponent> sprites
+array<TextComponent> texts
+Entity itemSlot
 
 
 --Methods--

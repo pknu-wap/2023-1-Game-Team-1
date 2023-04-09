@@ -1,10 +1,10 @@
 --Properties--
 
-Component message 
-Component btnOk 
-Component btnCancel 
-Entity popupGroup 
-Entity popup 
+Component message
+Component btnOk
+Component btnCancel
+Entity popupGroup
+Entity popup
 any onOk = nil
 any onCancel = nil
 number duration = 0.15

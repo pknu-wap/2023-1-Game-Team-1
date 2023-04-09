@@ -1,9 +1,9 @@
 --Properties--
 
-Entity reset 
-Entity getElixir 
-Entity getPowerElixir 
-Entity getSword 
+Entity reset
+Entity getElixir
+Entity getPowerElixir
+Entity getSword
 
 
 --Methods--
