@@ -43,7 +43,7 @@ def parseProperties(properties):
 
 
 def parseMethods(methods):
-    content = '\n\n--Methods--\n\n'
+    content = '--Methods--\n\n'
 
     for method in re.findall('{"Return".*?"Scope".*?}', methods):
         space = re.search('"ExecSpace":(.*?),', method).group(1)
@@ -69,7 +69,7 @@ def parseMethods(methods):
 
 
 def parseEvents(events):
-    content = '\n--Events--\n\n'
+    content = '--Events--\n\n'
 
     for event in re.findall('{"Name".*?"ExecSpace".*?}', events):
         space = re.search('"ExecSpace":(.*?)}', event).group(1)
@@ -78,7 +78,7 @@ def parseEvents(events):
         code = re.search('"Code":"(.*?)"', event).group(1)
         code = code.replace(newline, newline+tab)
         content += '[' + execSpace[int(space)] + ']\n' + type + \
-            '('+argType+' event)\n{\n' + tab + code + '\n}\n'
+            '('+argType+' event)\n{\n' + tab + code + '\n}\n\n'
 
     return content
 
@@ -87,14 +87,15 @@ def parseScript(folderName, line):
     scriptName = re.search('"Name":"(.*?)"', line).group(1)
 
     properties = re.search('"Properties".*"Methods"', line).group(0)
-    content = parseProperties(properties)
+    parsedProperties = parseProperties(properties)
 
     methods = re.search('"Methods".*"EntityEventHandlers"', line).group(0)
-    content += parseMethods(methods)
+    parsedMethods = parseMethods(methods)
 
     events = re.search('"EntityEventHandlers".*', line).group(0)
-    content += parseEvents(events)
+    parsedEvents = parseEvents(events)
 
+    content = parsedProperties + '\n\n' + parsedMethods + '\n' + parsedEvents
     content = content.replace(doubleQuot, '"')
     content = content.replace(newline, '\n')
     content = content.replace(tab, '\t')

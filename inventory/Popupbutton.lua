@@ -28,6 +28,7 @@ HandleButtonClickEvent(ButtonClickEvent event)
 	
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 }
+
 [Client Only]
 HandleButtonClickEvent2(ButtonClickEvent event)
 {
@@ -49,6 +50,7 @@ HandleButtonClickEvent2(ButtonClickEvent event)
 	
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 }
+
 [Client Only]
 HandleButtonClickEvent3(ButtonClickEvent event)
 {
@@ -69,6 +71,7 @@ HandleButtonClickEvent3(ButtonClickEvent event)
 	
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 }
+
 [Client Only]
 HandleButtonClickEvent4(ButtonClickEvent event)
 {
@@ -89,6 +92,7 @@ HandleButtonClickEvent4(ButtonClickEvent event)
 	
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 }
+
 [Client Only]
 HandleButtonClickEvent5(ButtonClickEvent event)
 {
@@ -109,6 +113,7 @@ HandleButtonClickEvent5(ButtonClickEvent event)
 	
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 }
+
 [Client Only]
 HandleButtonClickEvent6(ButtonClickEvent event)
 {
@@ -131,3 +136,4 @@ HandleButtonClickEvent6(ButtonClickEvent event)
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 	cancelbutton2:ConnectEvent(ButtonClickEvent,cancel)
 }
+
