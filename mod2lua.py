@@ -124,5 +124,4 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-# ModToLua(sys.argv[1])
-ModToLua("inventory.mod")
+ModToLua(sys.argv[1])

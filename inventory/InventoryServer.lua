@@ -75,7 +75,7 @@ void AddItem(string userId, string category, string itemCode)
 	end
 	
 	invenData = _HttpService:JSONEncode(inven)
-	db:SetAndWait(self.invenEquipKey, invenData)
+	db:SetAndWait(self.categoryToKey[category], invenData)
 	
 	self:UpdateUserData(userId)
 }
