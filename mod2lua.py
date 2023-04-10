@@ -23,16 +23,16 @@ def ModToTxt(modFileName):
 def parseProperties(properties):
     content = '--Properties--\n\n'
 
-    for property in re.findall('{.*?}', properties):
+    for property in re.findall('{.*?"Name".*?}', properties):
         type = re.search('"Type":"(.*?)"', property).group(1)
         name = re.search('"Name":"(.*?)"', property).group(1)
         value = re.search('"DefaultValue":"(.*?)"', property).group(1)
 
-        if type == "dictionary" or type == "array":
+        if type == 'array' or type == 'dictionary':
             value = value.replace('|', ', ')
             type += f'<{value}>'
             value = ''
-        elif type == "Entity" or type == "Component":
+        elif type == 'table' or type == 'Entity' or type == 'Component':
             value = ''
         else:
             value = f' = {value}'
@@ -101,7 +101,7 @@ def parseScript(folderName, line):
     content = content.replace(tab, '\t')
 
     file = f'{folderName}/{scriptName}.lua'
-    with open(file, 'w', encoding="utf-8") as script:
+    with open(file, 'w', encoding='utf-8') as script:
         script.write(content)
 
 
@@ -124,4 +124,5 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-ModToLua(sys.argv[1])
+# ModToLua(sys.argv[1])
+ModToLua("inventory.mod")
