@@ -6,7 +6,7 @@ import re
 doubleQuot = 'TMP_DOUBLE_QUOT'
 newline = 'TMP_NEWLINE'
 tab = 'TMP_TAB'
-execSpace = ['Default', 'Server Only', 'Client Only', 'Unknown Space 3',
+spaceDict = ['Default', 'Server Only', 'Client Only', 'Unknown Space 3',
              'Unknown Space 4', 'Server', 'Client', 'Unknown Space 7', 'Unknown Space 8', 'Multicast']
 
 
@@ -30,14 +30,14 @@ def parseProperties(properties):
 
         if type == "dictionary" or type == "array":
             value = value.replace('|', ', ')
-            type += '<'+value+'>'
+            type += f'<{value}>'
             value = ''
         elif type == "Entity" or type == "Component":
             value = ''
         else:
-            value = ' = '+value
+            value = f' = {value}'
 
-        content += type + ' ' + name + value + '\n'
+        content += f'{type} {name}{value}\n'
 
     return content
 
@@ -47,6 +47,7 @@ def parseMethods(methods):
 
     for method in re.findall('{"Return".*?"Scope".*?}', methods):
         space = re.search('"ExecSpace":(.*?),', method).group(1)
+        execSpace = spaceDict[int(space)]
         type = re.search('"Type":"(.*?)"', method).group(1)
         name = re.search('"Scope".*?"Name":"(.*?)"', method).group(1)
         arguments = ""
@@ -56,14 +57,13 @@ def parseMethods(methods):
             for arg in re.findall('{.*?"Name".*?}', args):
                 argType = re.search('"Type":"(.*?)"', arg).group(1)
                 argName = re.search('"Name":"(.*?)"', arg).group(1)
-                arguments += ', '+argType + ' '+argName
+                arguments += f', {argType} {argName}'
             arguments = arguments.replace(', ', '', 1)
 
         code = re.search('"Code":"(.*?)"', method).group(1)
-        code = code.replace(newline, newline+tab)
+        code = code.replace(newline, newline + tab)
 
-        content += '[' + execSpace[int(space)] + ']\n' + type + ' ' + name + \
-            '(' + arguments + ')\n{\n' + tab + code + '\n}\n\n'
+        content += f'[{execSpace}]\n{type} {name}({arguments})\n{{\n{tab}{code}\n}}\n\n'
 
     return content
 
@@ -73,12 +73,12 @@ def parseEvents(events):
 
     for event in re.findall('{"Name".*?"ExecSpace".*?}', events):
         space = re.search('"ExecSpace":(.*?)}', event).group(1)
+        execSpace = spaceDict[int(space)]
         type = re.search('"Name":"(.*?)"', event).group(1)
         argType = re.search('"EventName":"(.*?)"', event).group(1)
         code = re.search('"Code":"(.*?)"', event).group(1)
         code = code.replace(newline, newline+tab)
-        content += '[' + execSpace[int(space)] + ']\n' + type + \
-            '('+argType+' event)\n{\n' + tab + code + '\n}\n\n'
+        content += f'[{execSpace}]\n{type}({argType} event)\n{{\n{tab}{code}\n}}\n\n'
 
     return content
 
@@ -95,12 +95,13 @@ def parseScript(folderName, line):
     events = re.search('"EntityEventHandlers".*', line).group(0)
     parsedEvents = parseEvents(events)
 
-    content = parsedProperties + '\n\n' + parsedMethods + '\n' + parsedEvents
+    content = f'{parsedProperties}\n\n{parsedMethods}\n{parsedEvents}'
     content = content.replace(doubleQuot, '"')
     content = content.replace(newline, '\n')
     content = content.replace(tab, '\t')
 
-    with open(folderName+'/'+scriptName+'.lua', 'w', encoding="utf-8") as script:
+    file = f'{folderName}/{scriptName}.lua'
+    with open(file, 'w', encoding="utf-8") as script:
         script.write(content)
 
 
