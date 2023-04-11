@@ -17,6 +17,10 @@ Entity btnEquip
 Entity btnConsume
 Entity btnEtc
 Entity btnCostume
+string categoryEquip = nil
+string categoryConsume = nil
+string categoryEtc = nil
+string categoryCostume = nil
 
 
 --Methods--
@@ -24,51 +28,55 @@ Entity btnCostume
 [Client Only]
 void OnBeginPlay()
 {
-	-- 서버에서 slotCnt 값 불러오기
+	-- 서버에서 상수 값 불러오기
 	
 	self.slotCnt = _InventoryServer.slotCnt
+	self.categoryEquip = _InventoryServer.categoryEquip
+	self.categoryConsume = _InventoryServer.categoryConsume
+	self.categoryEtc = _InventoryServer.categoryEtc
+	self.categoryCostume = _InventoryServer.categoryCostume
 	
 	-- 클라이언트 데이터 구조 세팅
 	
-	self.datas.equip = {}
-	self.datas.consume = {}
-	self.datas.etc = {}
-	self.datas.costume = {}
+	self.datas[self.categoryEquip] = {}
+	self.datas[self.categoryConsume] = {}
+	self.datas[self.categoryEtc] = {}
+	self.datas[self.categoryCostume] = {}
 	self.datas.equipProp = {}
 	self.datas.itemProp = {}
 	
 	-- 데이터셋에서 아이템 정보 불러오기
 	
-	self.itemImg.equip = {}
+	self.itemImg[self.categoryEquip] = {}
 	local equipDataSet = _DataService:GetTable(self.equipDataSet)
 	for _, row in ipairs(equipDataSet:GetAllRow()) do
 		local code = row:GetItem("code")
 		local img = row:GetItem("img")
-		self.itemImg.equip[code] = img
+		self.itemImg[self.categoryEquip][code] = img
 	end
 	
-	self.itemImg.consume = {}
+	self.itemImg[self.categoryConsume] = {}
 	local consumeDataSet = _DataService:GetTable(self.consumeDataSet)
 	for _, row in ipairs(consumeDataSet:GetAllRow()) do
 		local code = row:GetItem("code")
 		local img = row:GetItem("img")
-		self.itemImg.consume[code] = img
+		self.itemImg[self.categoryConsume][code] = img
 	end
 	
-	self.itemImg.etc = {}
+	self.itemImg[self.categoryEtc] = {}
 	local etcDataSet = _DataService:GetTable(self.etcDataSet)
 	for _, row in ipairs(etcDataSet:GetAllRow()) do
 		local code = row:GetItem("code")
 		local img = row:GetItem("img")
-		self.itemImg.etc[code] = img
+		self.itemImg[self.categoryEtc][code] = img
 	end
 	
-	self.itemImg.costume = {}
+	self.itemImg[self.categoryCostume] = {}
 	local costumeDataSet = _DataService:GetTable(self.costumeDataSet)
 	for _, row in ipairs(costumeDataSet:GetAllRow()) do
 		local code = row:GetItem("code")
 		local img = row:GetItem("img")
-		self.itemImg.costume[code] = img
+		self.itemImg[self.categoryCostume][code] = img
 	end
 	
 	-- 아이템 슬롯 복제 및 스프라이트/텍스트 컴포넌트 저장
@@ -91,10 +99,10 @@ void OnBeginPlay()
 	
 	-- 카테고리 버튼 연동
 	
-	self.btnEquip:ConnectEvent(ButtonClickEvent, function() self:UpdateUI("equip") end)
-	self.btnConsume:ConnectEvent(ButtonClickEvent, function() self:UpdateUI("consume") end)
-	self.btnEtc:ConnectEvent(ButtonClickEvent, function() self:UpdateUI("etc") end)
-	self.btnCostume:ConnectEvent(ButtonClickEvent, function() self:UpdateUI("costume") end)
+	self.btnEquip:ConnectEvent(ButtonClickEvent, function() self:UpdateUI(self.categoryEquip) end)
+	self.btnConsume:ConnectEvent(ButtonClickEvent, function() self:UpdateUI(self.categoryConsume) end)
+	self.btnEtc:ConnectEvent(ButtonClickEvent, function() self:UpdateUI(self.categoryEtc) end)
+	self.btnCostume:ConnectEvent(ButtonClickEvent, function() self:UpdateUI(self.categoryCostume) end)
 }
 
 [Client]
@@ -104,10 +112,10 @@ void UpdateData(string datasJson)
 	
 	log("update data")
 	local datas = _HttpService:JSONDecode(datasJson)
-	self.datas.equip = _HttpService:JSONDecode(datas[1])
-	self.datas.consume = _HttpService:JSONDecode(datas[2])
-	self.datas.etc = _HttpService:JSONDecode(datas[3])
-	self.datas.costume = _HttpService:JSONDecode(datas[4])
+	self.datas[self.categoryEquip] = _HttpService:JSONDecode(datas[1])
+	self.datas[self.categoryConsume] = _HttpService:JSONDecode(datas[2])
+	self.datas[self.categoryEtc] = _HttpService:JSONDecode(datas[3])
+	self.datas[self.categoryCostume] = _HttpService:JSONDecode(datas[4])
 	self.datas.equipProp = _HttpService:JSONDecode(datas[5])
 	self.datas.itemProp = _HttpService:JSONDecode(datas[6])
 	
@@ -129,7 +137,7 @@ void UpdateUI(string category)
 		if inven[i] then
 			local id = inven[i]
 			local code = nil
-			if category == "equip" then
+			if category == self.categoryEquip then
 				code = self.datas.equipProp[id].code
 			else
 				code = id

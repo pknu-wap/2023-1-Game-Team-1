@@ -10,6 +10,10 @@ string itemPropKey = "Item_Property"
 string nextIDKey = "Next_ID"
 number slotCnt = 30
 dictionary<string, string> categoryToKey
+string categoryEquip = "equip"
+string categoryConsume = "consume"
+string categoryEtc = "etc"
+string categoryCostume = "costume"
 
 
 --Methods--
@@ -19,10 +23,10 @@ void OnBeginPlay()
 {
 	-- category와 key 매칭
 	
-	self.categoryToKey.equip = self.invenEquipKey
-	self.categoryToKey.consume = self.invenConsumeKey
-	self.categoryToKey.etc = self.invenEtcKey
-	self.categoryToKey.costume = self.invenCostumeKey
+	self.categoryToKey[self.categoryEquip] = self.invenEquipKey
+	self.categoryToKey[self.categoryConsume] = self.invenConsumeKey
+	self.categoryToKey[self.categoryEtc] = self.invenEtcKey
+	self.categoryToKey[self.categoryCostume] = self.invenCostumeKey
 }
 
 [Server]
@@ -37,7 +41,7 @@ void AddItem(string userId, string category, string itemCode)
 	local inven = _HttpService:JSONDecode(invenData)
 	local pos = nil
 	
-	if category == "equip" then
+	if category == self.categoryEquip then
 		local _, equipPropData = db:GetAndWait(self.equipPropKey)
 		equipPropData = equipPropData or "{}"
 		local equipProp = _HttpService:JSONDecode(equipPropData)
@@ -99,26 +103,13 @@ void ResetInventory(string userId)
 	
 	log("Reset Inven")
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, invenEquipData = db:GetAndWait(self.invenEquipKey)
-	local _, invenConsumeData = db:GetAndWait(self.invenConsumeKey)
-	local _, invenEtcData = db:GetAndWait(self.invenEtcKey)
-	local _, invenCostumeData = db:GetAndWait(self.invenCostumeKey)
-	local _, EquipPropData = db:GetAndWait(self.equipPropKey)
-	local _, itemCntData = db:GetAndWait(self.itemPropKey)
 	
-	invenEquipData = "{}"
-	invenConsumeData = "{}"
-	invenEtcData = "{}"
-	invenCostumeData = "{}"
-	EquipPropData = "{}"
-	itemCntData = "{}"
-	
-	db:SetAndWait(self.invenEquipKey, invenEquipData)
-	db:SetAndWait(self.invenConsumeKey, invenConsumeData)
-	db:SetAndWait(self.invenEtcKey, invenEtcData)
-	db:SetAndWait(self.invenCostumeKey, invenCostumeData)
-	db:SetAndWait(self.equipPropKey, EquipPropData)
-	db:SetAndWait(self.itemPropKey, itemCntData)
+	db:SetAndWait(self.invenEquipKey, "{}")
+	db:SetAndWait(self.invenConsumeKey, "{}")
+	db:SetAndWait(self.invenEtcKey, "{}")
+	db:SetAndWait(self.invenCostumeKey, "{}")
+	db:SetAndWait(self.equipPropKey, "{}")
+	db:SetAndWait(self.itemPropKey, "{}")
 	
 	self:UpdateUserData(userId)
 }
