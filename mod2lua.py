@@ -2,6 +2,8 @@ import sys
 import shutil
 import os
 import re
+import time
+import traceback
 
 doubleQuot = 'TMP_DOUBLE_QUOT'
 newline = 'TMP_NEWLINE'
@@ -124,4 +126,16 @@ def ModToLua(modFileName):
     TxtToLua(txtFileName)
 
 
-ModToLua(sys.argv[1])
+def logError(err):
+    current_time = time.strftime(
+        "%Y.%m.%d/%H:%M:%S", time.localtime(time.time()))
+    with open("log.txt", "a") as f:
+        f.write(f"[{current_time}] - {err}\n")
+
+
+try:
+    modFileName = sys.argv[1]
+    ModToLua(modFileName)
+except Exception:
+    err = traceback.format_exc()
+    logError(str(err))
