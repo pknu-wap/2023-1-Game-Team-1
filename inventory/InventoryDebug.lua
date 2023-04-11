@@ -5,6 +5,7 @@ Entity getElixir
 Entity getPowerElixir
 Entity getSword
 Entity removeElixir
+Entity getScroll
 
 
 --Methods--
@@ -17,6 +18,7 @@ void OnBeginPlay()
 	self.getPowerElixir:ConnectEvent(ButtonClickEvent, function() self:GetItem("consume", "2") end)
 	self.getSword:ConnectEvent(ButtonClickEvent, function() self:GetItem("equip", "1") end)
 	self.removeElixir:ConnectEvent(ButtonClickEvent, function() self:RemoveItem("consume", "1") end)
+	self.getScroll:ConnectEvent(ButtonClickEvent, function() self:GetItem("etc", "1") end)
 }
 
 [Default]
