@@ -106,18 +106,18 @@ void OnBeginPlay()
 }
 
 [Client]
-void UpdateData(string datasJson)
+void UpdateData(string encodedJsons)
 {
 	-- 인벤토리 데이터를 갱신한다.
 	
 	log("update data")
-	local datas = _HttpService:JSONDecode(datasJson)
-	self.datas[self.categoryEquip] = _HttpService:JSONDecode(datas[1])
-	self.datas[self.categoryConsume] = _HttpService:JSONDecode(datas[2])
-	self.datas[self.categoryEtc] = _HttpService:JSONDecode(datas[3])
-	self.datas[self.categoryCostume] = _HttpService:JSONDecode(datas[4])
-	self.datas.equipProp = _HttpService:JSONDecode(datas[5])
-	self.datas.itemProp = _HttpService:JSONDecode(datas[6])
+	local jsons = _HttpService:JSONDecode(encodedJsons)
+	self.datas[self.categoryEquip] = _HttpService:JSONDecode(jsons[1])
+	self.datas[self.categoryConsume] = _HttpService:JSONDecode(jsons[2])
+	self.datas[self.categoryEtc] = _HttpService:JSONDecode(jsons[3])
+	self.datas[self.categoryCostume] = _HttpService:JSONDecode(jsons[4])
+	self.datas.equipProp = _HttpService:JSONDecode(jsons[5])
+	self.datas.itemProp = _HttpService:JSONDecode(jsons[6])
 	
 	self:UpdateUI(self.currentCategory)
 }
@@ -134,7 +134,7 @@ void UpdateUI(string category)
 	for i = 1, self.slotCnt do
 		local img = self.emptyImg
 		local txt = ""
-		if inven[i] then
+		if inven[i] ~= 0 then
 			local id = inven[i]
 			local code = nil
 			if category == self.categoryEquip then
