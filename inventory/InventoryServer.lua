@@ -61,17 +61,18 @@ void AddItem(string userId, string category, string itemCode)
 		itemPropJson = itemPropJson or "{}"
 		local itemProp = _HttpService:JSONDecode(itemPropJson)
 		
-		itemProp[itemCode] = itemProp[itemCode] or {}
-		local cnt = itemProp[itemCode].cnt or 0
+		itemProp[category] = itemProp[category] or {}
+		itemProp[category][itemCode] = itemProp[category][itemCode] or {}
+		local cnt = itemProp[category][itemCode].cnt or 0
 		
 		if cnt > 0 then
-			pos = itemProp[itemCode].pos
-			itemProp[itemCode].cnt = itemProp[itemCode].cnt + 1
+			pos = itemProp[category][itemCode].pos
+			itemProp[category][itemCode].cnt = itemProp[category][itemCode].cnt + 1
 		else
 			pos = self:GetEmptySpace(inven)
 			inven[pos] = itemCode
-			itemProp[itemCode].pos = pos
-			itemProp[itemCode].cnt = 1
+			itemProp[category][itemCode].pos = pos
+			itemProp[category][itemCode].cnt = 1
 		end
 		
 	    itemPropJson = _HttpService:JSONEncode(itemProp)
@@ -172,12 +173,13 @@ void RemoveItem(string userId, string category, string itemId)
 		local _, itemPropJson = db:GetAndWait(self.itemPropKey)
 		itemPropJson = itemPropJson or "{}"
 		local itemProp = _HttpService:JSONDecode(itemPropJson)
-		assert(itemProp[itemId] and itemProp[itemId].cnt > 0, "해당 아이템이 없습니다.")
-		itemProp[itemId].cnt = itemProp[itemId].cnt - 1
-		if itemProp[itemId].cnt <= 0 then
-			local pos = itemProp[itemId].pos
+		itemProp[category] = itemProp[category] or {}
+		assert(itemProp[category][itemId] and itemProp[category][itemId].cnt > 0, "해당 아이템이 없습니다.")
+		itemProp[category][itemId].cnt = itemProp[category][itemId].cnt - 1
+		if itemProp[category][itemId].cnt <= 0 then
+			local pos = itemProp[category][itemId].pos
 			inven[pos] = 0
-			itemProp[itemId] = nil
+			itemProp[category][itemId] = nil
 			invenJson = _HttpService:JSONEncode(inven)
 			db:SetAndWait(self.categoryToKey[category], invenJson)
 		end

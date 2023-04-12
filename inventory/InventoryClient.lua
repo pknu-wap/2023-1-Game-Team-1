@@ -141,7 +141,7 @@ void UpdateUI(string category)
 				code = self.datas.equipProp[id].code
 			else
 				code = id
-				txt = self.datas.itemProp[id].cnt
+				txt = self.datas.itemProp[category][id].cnt
 			end
 			img = self.itemImg[category][code]
 		end
