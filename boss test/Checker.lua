@@ -2,6 +2,7 @@
 
 any Child = nil
 Entity player
+Component BossAiComponent
 
 
 --Methods--
@@ -28,9 +29,6 @@ void OnInit()
 	if self.player == nil then
 		log("Checker 플레이어 셋")
 		local bossAIcomponent = self.ParentAI.Entity.BossAIComponent
-		bossAIcomponent:SetPlayer()
-		
-		self.player = bossAIcomponent.player 
 		
 	end
 }

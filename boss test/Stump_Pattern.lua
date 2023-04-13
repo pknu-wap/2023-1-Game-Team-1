@@ -1,6 +1,7 @@
 --Properties--
 
 number PtNo = 0
+Component BossAIComponent
 
 
 --Methods--

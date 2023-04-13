@@ -1,6 +1,7 @@
 --Properties--
 
-Entity player
+Entity target
+Component BossAIComponent
 
 
 --Methods--
@@ -8,7 +9,13 @@ Entity player
 [Default]
 void OnInit()
 {
-	self.player = self.ParentAI.Entity.BossAIComponent.player
+	self.target = self.ParentAI.Entity.BossAIComponent.target
+}
+
+[Default]
+any OnBehave(number delta)
+{
+	return BehaviourTreeStatus.Failure
 }
 
 

@@ -1,8 +1,10 @@
 --Properties--
 
-Entity player
+Entity target
 string map = ""
 Component BossComponent
+array<Entity> player
+number detectDistance = 4
 
 
 --Methods--
@@ -11,8 +13,9 @@ Component BossComponent
 void OnBeginPlay()
 {
 	log("root node를 설정")
-	self.map = _EntityService:GetEntityByPath("/maps/map01").Name
+	self.map = self.Entity.CurrentMap.Name
 	log("map : " ..self.map)
+	--self:GetPlayer()
 	
 	self.BossComponent = self.Entity.Boss
 	
@@ -22,12 +25,16 @@ void OnBeginPlay()
 	
 	local Seq = SequenceNode()
 	local Succeeder = Checker()
-	Succeeder.player = self.player
+	--Succeeder.player = self.player
+	Succeeder.BossAiComponent = self.Entity.BossAIComponent
 	
 	local CA = CanAttack()
-	CA.player = self.player
+	--CA.player = self.player
+	CA.BossAIComponent = self.Entity.BossAIComponent
+	
 	local Chase = ChaseTarget()
-	Chase.player = self.player
+	--Chase.player = self.player
+	Chase.BossAIComponent = self.Entity.BossAIComponent
 	
 	local ATK = RandomSelectorNode()
 	
@@ -52,17 +59,45 @@ void OnBeginPlay()
 }
 
 [Server]
+void GetPlayer()
+{
+	log("GetPlayer 실행")
+	
+	local playersArr = _UserService:GetUsersByMapName(self.Entity.CurrentMap.Name)
+	log("GetPlayer 찾는중")
+	for i, p in pairs(playersArr) do
+		self.player[i] = p
+		log(i.."번째" .. p.Name)
+		log(i.."번째의 player " .. self.player[i].Name)
+	end
+	
+	--self:SetPlayer()
+}
+
+[Server]
 void SetPlayer()
 {
-	
-	log("SetPlayer : map " ..self.map)
-	local playersArr = _UserService:GetUsersByMapName(self.map)
-	for i, p in pairs(playersArr) do
-		local dir = p.TransformComponent.Position - self.
+	local dist = math.maxinteger
+	log("어디서 오류 ? 1")
+	for i, p in pairs(self.player) do
+		log("어디서 오류 ? 2")
+		if self.target == nil then
+			log("어디서 오류 ? 3")
+			self.target = p
+		else
+			if isvalid(p) then
+				log("어디서 오류 ? 4")
+				local distTemp = Vector2.Distance(p.TransformComponent.Position:ToVector2(), self.Entity.TransformComponent.Position:ToVector2())
+				
+				dist = math.min(dist, distTemp)
+				
+				if dist <= self.detectDistance then
+					self.target = p
+					log("타겟 설정 " ..self.target.Name)
+				end
+			end
+		end
 		
-		if self.player == nil or p.TransformComponent
-		self.player = p
-		log("PlayerName : CurrentMap = "..p.Name.." : "..p.CurrentMap.Name)
 	end
 }
 
