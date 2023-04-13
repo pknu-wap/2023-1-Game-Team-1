@@ -1,7 +1,6 @@
 --Properties--
 
 Entity target
-number time = 0
 Component BossAIComponent
 
 
@@ -17,7 +16,13 @@ void OnInit()
 	
 	self.BossAIComponent:SetPlayer()
 	
-	self.time = _UtilLogic:RandomDouble() * 3
+	if bossAiComponent.target ~= nil then
+		self.target = bossAiComponent.target
+	end
+	
+	if self.target ~= nil then
+		log("타겟 설정 완료! Can Attack 의 타겟 네임 : " ..self.target.Name)
+	end
 }
 
 [Default]
@@ -28,7 +33,9 @@ any OnBehave(number delta)
 		log("CanAttack 플레이어 찾을 수 없음")
 		return BehaviourTreeStatus.Failure
 	end	
-	return BehaviourTreeStatus.Failure
+	
+	log("CanAttack 플레이어 찾음 " ..self.target.Name)
+	return BehaviourTreeStatus.Success
 }
 
 

@@ -24,6 +24,7 @@ void OnBeginPlay()
 	local repeater = SelectorNode()
 	
 	local Seq = SequenceNode()
+	
 	local Succeeder = Checker()
 	--Succeeder.player = self.player
 	Succeeder.BossAiComponent = self.Entity.BossAIComponent
@@ -33,6 +34,7 @@ void OnBeginPlay()
 	CA.BossAIComponent = self.Entity.BossAIComponent
 	
 	local Chase = ChaseTarget()
+	Chase.ExclusiveExecutionWhenRunning = true
 	--Chase.player = self.player
 	Chase.BossAIComponent = self.Entity.BossAIComponent
 	
@@ -77,17 +79,33 @@ void GetPlayer()
 [Server]
 void SetPlayer()
 {
-	local dist = math.maxinteger
-	log("어디서 오류 ? 1")
+	local dist
+	
+	if self.target == nil then
+		dist = math.maxinteger
+	else
+		dist = Vector2.Distance(self.target.TransformComponent.Position:ToVector2(), self.Entity.TransformComponent.Position:ToVector2())
+	end
+	
+	--og("어디서 오류 ? 1")
 	for i, p in pairs(self.player) do
-		log("어디서 오류 ? 2")
+		--log("어디서 오류 ? 2")
 		if self.target == nil then
-			log("어디서 오류 ? 3")
+			--log("어디서 오류 ? 3")
 			self.target = p
 		else
 			if isvalid(p) then
-				log("어디서 오류 ? 4")
+				--log("어디서 오류 ? 4")
+				if p == self.target then
+					log("같은 타겟입니다! 스킵합니다.")
+					goto skip_set_target
+				end
+				
 				local distTemp = Vector2.Distance(p.TransformComponent.Position:ToVector2(), self.Entity.TransformComponent.Position:ToVector2())
+				
+				if dist < distTemp then
+					goto skip_set_target
+				end
 				
 				dist = math.min(dist, distTemp)
 				
@@ -95,9 +113,15 @@ void SetPlayer()
 					self.target = p
 					log("타겟 설정 " ..self.target.Name)
 				end
+				
+				::skip_set_target::
 			end
 		end
 		
+	end
+	
+	if self.target ~= nil then
+		CanAttack().target = self.target
 	end
 }
 
