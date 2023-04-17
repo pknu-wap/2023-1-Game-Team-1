@@ -9,13 +9,19 @@ Component BossAIComponent
 [Default]
 any OnBehave(number delta)
 {
-	log("PtNo : 성공")
+	log("PtNo : 성공 " ..self.PtNo)
 	if self.ParentAI.Entity.StateComponent.CurrentStateName ~= "MOVE" then
 		log("움직이지 않습니다")
 		return BehaviourTreeStatus.Failure
 	end
 	
 	return BehaviourTreeStatus.Success
+}
+
+[Default]
+void OnInit()
+{
+	
 }
 
 

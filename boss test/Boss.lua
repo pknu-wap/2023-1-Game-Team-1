@@ -7,6 +7,7 @@ number DestroyDelay = 0.6
 Component stateAnimationComponent
 Component stateComponent
 Entity map
+Component BossMovementComponent
 
 
 --Methods--
@@ -16,6 +17,10 @@ void OnBeginPlay()
 {
 	self.Hp = self.MaxHp
 	self.stateAnimationComponent = self.Entity.StateAnimationComponent
+	self.stateComponent = self.Entity.StateComponent
+	self.BossMovementComponent = self.Entity.MovementComponent
+	
+	log("현재 체력 " ..self.Hp)
 }
 
 [Server Only]
@@ -40,7 +45,7 @@ void Dead()
 void Hit()
 {
 	if self.stateComponent then
-		self.stateComponent:ChangeState("HIT")
+		--self.stateComponent:ChangeState("HIT")
 	end
 }
 

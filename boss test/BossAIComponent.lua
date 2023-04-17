@@ -18,6 +18,9 @@ void OnBeginPlay()
 	--self:GetPlayer()
 	
 	self.BossComponent = self.Entity.Boss
+	if isvalid(self.BossComponent) then
+		log("보스컴포넌트 잘 들고왔수다")
+	end
 	
 	local root = SequenceNode()	
 	
