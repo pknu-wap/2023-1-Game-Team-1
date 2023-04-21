@@ -9,15 +9,15 @@ Component BossAIComponent
 [Default]
 void OnInit()
 {
-	local bossAiComponent = self.ParentAI.Entity.BossAIComponent
-	if isvalid(bossAiComponent) then
-		log("boss컴포넌트 획득")
+	--local bossAiComponent = self.ParentAI.Entity.BossAIComponent
+	if isvalid(self.BossAIComponent) then
+		log("CanAttack boss컴포넌트 획득")
 	end
 	
 	self.BossAIComponent:SetPlayer()
 	
-	if bossAiComponent.target ~= nil then
-		self.target = bossAiComponent.target
+	if self.BossAIComponent.target ~= nil then
+		self.target = self.BossAIComponent.target
 	end
 	
 	if self.target ~= nil then
@@ -29,12 +29,13 @@ void OnInit()
 any OnBehave(number delta)
 {
 	log("CanAttack 실행")
-	if self.target == nil then
-		log("CanAttack 플레이어 찾을 수 없음")
+	if self.target == nil or self.ParentAI.Entity.StateComponent.CurrentStateName ~= "IDLE" then
+		log(self.ParentAI.Entity.StateComponent.CurrentStateName)
 		return BehaviourTreeStatus.Failure
-	end	
+	end
 	
 	log("CanAttack 플레이어 찾음 " ..self.target.Name)
+	
 	return BehaviourTreeStatus.Success
 }
 

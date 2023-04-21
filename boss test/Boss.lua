@@ -8,6 +8,8 @@ Component stateAnimationComponent
 Component stateComponent
 Entity map
 Component BossMovementComponent
+number speed = 0.5
+number detectDistance = 0
 
 
 --Methods--
@@ -47,6 +49,12 @@ void Hit()
 	if self.stateComponent then
 		--self.stateComponent:ChangeState("HIT")
 	end
+}
+
+[Server Only]
+void OnUpdate(number delta)
+{
+	log("보스 현재 스테이트 상태 : " ..self.stateComponent.CurrentStateName)
 }
 
 
