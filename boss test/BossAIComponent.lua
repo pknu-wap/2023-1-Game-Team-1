@@ -2,9 +2,10 @@
 
 Entity target
 string map = ""
-Component BossComponent
+any BossComponent = nil
 array<Entity> player
 number detectDistance = 4
+any ATK = nil
 
 
 --Methods--
@@ -18,8 +19,13 @@ void OnBeginPlay()
 	--self:GetPlayer()
 	
 	self.BossComponent = self.Entity.Boss
+	if isvalid(_EntityService:GetEntityByTag("Stump")) then
+		self.BossComponent = self.Entity.StumpBoss
+		self.detectDistance = 1
+	end
+	
 	if isvalid(self.BossComponent) then
-		log("보스컴포넌트 잘 들고왔수다")
+			log("보스 컴포넌트 확인")
 	end
 	
 	local root = SequenceNode()	
@@ -41,19 +47,24 @@ void OnBeginPlay()
 	--Chase.player = self.player
 	Chase.BossAIComponent = self.Entity.BossAIComponent
 	
-	local ATK = RandomSelectorNode()
+	self.ATK = RandomSelectorNode()
+	
+	if self.ATK ~= nil then
+		log("ATK 잘들어가있듬")
+	end
 	
 	local Pt = {}
+	
 	for i = 0,9 do
 		Pt[i] = Stump_Pattern()
 		Pt[i].PtNo = i
-		ATK:AttachChild(Pt[i])
-		ATK:SetChildNodeProbability(Pt[i], 0.15)
+		self.ATK:AttachChild(Pt[i])
+		self.ATK:SetChildNodeProbability(Pt[i], 0.15)
 	end
 	
 	Seq:AttachChild(CA)
 	Seq:AttachChild(Chase)
-	Seq:AttachChild(ATK)
+	Seq:AttachChild(self.ATK)
 	
 	repeater:AttachChild(Seq)
 	repeater:AttachChild(Succeeder)
