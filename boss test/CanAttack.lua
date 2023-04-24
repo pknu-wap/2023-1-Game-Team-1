@@ -29,8 +29,8 @@ void OnInit()
 any OnBehave(number delta)
 {
 	log("CanAttack 실행")
-	if self.target == nil or self.ParentAI.Entity.StateComponent.CurrentStateName ~= "IDLE" then
-		log(self.ParentAI.Entity.StateComponent.CurrentStateName)
+	if self.target == nil then
+		log("타겟 nil")
 		return BehaviourTreeStatus.Failure
 	end
 	

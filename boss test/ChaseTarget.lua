@@ -23,6 +23,7 @@ void OnInit()
 	self.time = _UtilLogic:RandomDouble() * 3
 	self.BossAIComponent.BossComponent.stateComponent:ChangeState("CHASE")
 	self.BossAIComponent.BossComponent.BossMovementComponent.InputSpeed = self.BossAIComponent.BossComponent.speed
+	self.BossAIComponent.BossComponent.InRange = false
 	
 	ChaseTarget().ExclusiveExecutionWhenRunning = true
 }
@@ -50,12 +51,14 @@ any OnBehave(number delta)
 		log("타겟 범위 안")
 		self.BossAIComponent.BossComponent.BossMovementComponent.InputSpeed = 0
 		--self.ExclusiveExecutionWhenRunning = false
+		self.BossAIComponent.BossComponent.InRange = true
 		return BehaviourTreeStatus.Success
 	
 	elseif	self.time < 0 then
 		log("타겟 범위 밖 시간 오버")
 		self.BossAIComponent.BossComponent.BossMovementComponent.InputSpeed = 0
 		--self.ExclusiveExecutionWhenRunning = false
+		self.BossAIComponent.BossComponent.InRange = false
 		return BehaviourTreeStatus.Success
 	end
 	
