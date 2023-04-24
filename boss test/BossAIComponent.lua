@@ -13,9 +13,9 @@ any ATK = nil
 [Server Only]
 void OnBeginPlay()
 {
-	log("root node를 설정")
+	--log("root node를 설정")
 	self.map = self.Entity.CurrentMap.Name
-	log("map : " ..self.map)
+	--log("map : " ..self.map)
 	--self:GetPlayer()
 	
 	self.BossComponent = self.Entity.Boss
@@ -50,7 +50,7 @@ void OnBeginPlay()
 	self.ATK = RandomSelectorNode()
 	
 	if self.ATK ~= nil then
-		log("ATK 잘들어가있듬")
+		--log("ATK 잘들어가있듬")
 	end
 	
 	local Pt = {}
@@ -62,9 +62,13 @@ void OnBeginPlay()
 		self.ATK:SetChildNodeProbability(Pt[i], 0.15)
 	end
 	
+	local Attacking = Attacking()
+	Attacking.BossAIComponent = self.Entity.BossAIComponent
+	
 	Seq:AttachChild(CA)
 	Seq:AttachChild(Chase)
 	Seq:AttachChild(self.ATK)
+	Seq:AttachChild(Attacking)
 	
 	repeater:AttachChild(Seq)
 	repeater:AttachChild(Succeeder)
@@ -77,10 +81,10 @@ void OnBeginPlay()
 [Server]
 void GetPlayer()
 {
-	log("GetPlayer 실행")
+	--log("GetPlayer 실행")
 	
 	local playersArr = _UserService:GetUsersByMapName(self.Entity.CurrentMap.Name)
-	log("GetPlayer 찾는중")
+	--log("GetPlayer 찾는중")
 	for i, p in pairs(playersArr) do
 		self.player[i] = p
 		log(i.."번째" .. p.Name)

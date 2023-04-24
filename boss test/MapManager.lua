@@ -18,10 +18,10 @@ HandleUserEnterEvent(UserEnterEvent event)
 	-- Parameters
 	local UserId = event.UserId
 	---------------------------------------------------------
-	log("User Enter ! " ..UserId)
+	--log("User Enter ! " ..UserId)
 	
 	local boss = _EntityService:GetEntityByTag("Boss")
-	log("보스 이름 " ..boss.Name)
+	--log("보스 이름 " ..boss.Name)
 	
 	boss.BossAIComponent:GetPlayer()
 }

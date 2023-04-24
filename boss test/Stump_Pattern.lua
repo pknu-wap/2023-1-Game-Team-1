@@ -15,7 +15,7 @@ void OnInit()
 [Default]
 any OnBehave(number delta)
 {
-	log("PtNo : 성공 ")-- ..self.PtNo)
+	--log("PtNo : 성공 ")-- ..self.PtNo)
 	if self.ParentAI.Entity.StateComponent.CurrentStateName ~= "CHASE" then
 		log("움직이지 않습니다")
 		return BehaviourTreeStatus.Failure
