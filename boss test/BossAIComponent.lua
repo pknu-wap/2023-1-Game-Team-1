@@ -2,7 +2,7 @@
 
 Entity target
 string map = ""
-any BossComponent = nil
+Component BossComponent
 array<Entity> player
 number detectDistance = 4
 any ATK = nil
@@ -20,7 +20,7 @@ void OnBeginPlay()
 	
 	self.BossComponent = self.Entity.Boss
 	if isvalid(_EntityService:GetEntityByTag("Stump")) then
-		self.BossComponent = self.Entity.StumpBoss
+		self.BossComponent = self.Entity.Boss
 		self.detectDistance = 1
 	end
 	
