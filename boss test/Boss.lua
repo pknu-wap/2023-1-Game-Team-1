@@ -3,11 +3,18 @@
 number MaxHp = 100
 number Hp = 0
 boolean IsDead = false
+number speed = 0.5
+number detectDistance = 0
 number DestroyDelay = 0.6
-Component stateAnimationComponent
 Component stateComponent
-Entity map
+Component stateAnimationComponent
 Component BossMovementComponent
+Component BossAIComponent
+Component BossTransformComponent
+Entity map
+boolean attackEnd = true
+boolean InRange = false
+Component SpriteComponent
 
 
 --Methods--
@@ -19,8 +26,12 @@ void OnBeginPlay()
 	self.stateAnimationComponent = self.Entity.StateAnimationComponent
 	self.stateComponent = self.Entity.StateComponent
 	self.BossMovementComponent = self.Entity.MovementComponent
+	self.BossAIComponent = self.Entity.BossAIComponent
+	self.BossTransformComponent = self.Entity.TransformComponent
+	self.SpriteComponent = self.Entity.SpriteRendererComponent
+	self.attackEnd = true
 	
-	log("현재 체력 " ..self.Hp)
+	--log("현재 체력 " ..self.Hp)
 }
 
 [Server Only]
@@ -47,6 +58,12 @@ void Hit()
 	if self.stateComponent then
 		--self.stateComponent:ChangeState("HIT")
 	end
+}
+
+[Server Only]
+void OnUpdate(number delta)
+{
+	log("보스 현재 스테이트 상태 : " ..self.stateComponent.CurrentStateName)
 }
 
 
