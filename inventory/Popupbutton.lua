@@ -13,20 +13,15 @@ HandleButtonClickEvent(ButtonClickEvent event)
 	-- Parameters
 	local Entity = event.Entity
 	--------------------------------------------------------
-	if Entity.Name~="1" then return end
-	--AchieveUI
+	--MenuButton
 	
-	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/AchieveUI")
+	local panel=_EntityService:GetEntityByPath("/ui/ButtonGroup/Menu_Panel")
 	
-	panel.Enable=true
-	
-	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/AchieveUI/TitlePanel/ExitButton")
-	
-	local cancel=function()
+	if panel.Enable==false then
+		panel.Enable=true
+	else
 		panel.Enable=false
 	end
-	
-	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
 }
 
 [Client Only]
@@ -35,14 +30,13 @@ HandleButtonClickEvent2(ButtonClickEvent event)
 	-- Parameters
 	local Entity = event.Entity
 	--------------------------------------------------------
-	if Entity.Name~="2" then return end
-	--MonsterDexUI
+	--BasicPopup
 	
-	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/MonsterDexUI")
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/BasicPopup")
 	panel.Enable=true
 	
 	
-	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/MonsterDexUI/TitlePanel/ExitButton")
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/BasicPopup/Panel/OKButton")
 	
 	local cancel=function()
 		panel.Enable=false
@@ -56,14 +50,13 @@ HandleButtonClickEvent3(ButtonClickEvent event)
 {
 	-- Parameters
 	local Entity = event.Entity
-	--------------------------------------------------------
-	if Entity.Name~="3" then return end
-	--QuestUI"
+	--------------------------------------------------------"
+	--TabPopup
 	
-	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/QuestUI")
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/TabPopup")
 	panel.Enable=true
 	
-	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/QuestUI/QuestUITitle/ExitButton")
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/TabPopup/Panel/TitlePanel/ExitButton")
 	
 	local cancel=function()
 		panel.Enable=false
@@ -78,13 +71,12 @@ HandleButtonClickEvent4(ButtonClickEvent event)
 	-- Parameters
 	local Entity = event.Entity
 	--------------------------------------------------------
-	if Entity.Name~="4" then return end
-	--InventoryUI
+	--AchievementPopup
 	
-	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/InventoryUI")
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/AchievementPopup")
 	panel.Enable=true
 	
-	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/InventoryUI/TopPanel/ExitButton")
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/AchievementPopup/Panel/TitlePanel/ExitButton")
 	
 	local cancel=function()
 		panel.Enable=false
@@ -99,13 +91,12 @@ HandleButtonClickEvent5(ButtonClickEvent event)
 	-- Parameters
 	local Entity = event.Entity
 	--------------------------------------------------------
-	if Entity.Name~="5" then return end
-	--BasicPopup
+	--InventoryPopup
 	
-	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/ShopUI")
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/InventoryPopup")
 	panel.Enable=true
 	
-	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/ShopUI/TopPanel/ExitButton")
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/InventoryPopup/Panel/TitlePanel/ExitButton")
 	
 	local cancel=function()
 		panel.Enable=false
@@ -120,20 +111,71 @@ HandleButtonClickEvent6(ButtonClickEvent event)
 	-- Parameters
 	local Entity = event.Entity
 	--------------------------------------------------------
-	if Entity.Name~="6" then return end
-	--BasicPopup
+	--DailyRewardPopup
 	
-	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/BasicPopup")
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/DailyRewardPopup")
 	panel.Enable=true
 	
-	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/BasicPopup/PopupBtnOK")
-	local cancelbutton2=_EntityService:GetEntityByPath("/ui/PopupGroup/BasicPopup/PopupBtnCancel")
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/DailyRewardPopup/Panel/TitlePanel/ExitButton")
 	
 	local cancel=function()
 		panel.Enable=false
 	end
 	
 	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
-	cancelbutton2:ConnectEvent(ButtonClickEvent,cancel)
+}
+
+[Client Only]
+HandleButtonClickEvent7(ButtonClickEvent event)
+{
+	--------------- Native Event Sender Info ----------------
+	-- Sender: ButtonComponent
+	-- Space: Client
+	---------------------------------------------------------
+	
+	-- Parameters
+	local Entity = event.Entity
+	---------------------------------------------------------
+	
+	--ShopPopup
+	
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/ShopPopup")
+	panel.Enable=true
+	
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/ShopPopup/Panel/TitlePanel/ExitButton")
+	
+	local cancel=function()
+		panel.Enable=false
+	end
+	
+	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
+	
+}
+
+[Client Only]
+HandleButtonClickEvent8(ButtonClickEvent event)
+{
+	--------------- Native Event Sender Info ----------------
+	-- Sender: ButtonComponent
+	-- Space: Client
+	---------------------------------------------------------
+	
+	-- Parameters
+	local Entity = event.Entity
+	---------------------------------------------------------
+	
+	--Shop_DetailInfoPopup
+	
+	local panel=_EntityService:GetEntityByPath("/ui/PopupGroup/Shop_DetailInfoPopup")
+	panel.Enable=true
+	
+	local cancelbutton=_EntityService:GetEntityByPath("/ui/PopupGroup/Shop_DetailInfoPopup/DetailInfoPopup/Panel/ExitButton")
+	
+	local cancel=function()
+		panel.Enable=false
+	end
+	
+	cancelbutton:ConnectEvent(ButtonClickEvent,cancel)
+	
 }
 

@@ -1,19 +1,24 @@
 --Properties--
 
-string globalKey = "Global_1"
-string invenEquipKey = "Inventory_Equip"
-string invenConsumeKey = "Inventory_Consume"
-string invenEtcKey = "Inventory_Etc"
-string invenCostumeKey = "Inventory_Costume"
-string equipPropKey = "Equip_Property"
-string itemPropKey = "Item_Property"
-string uniqueIdKey = "Unique_Id"
-number slotCnt = 30
 dictionary<string, string> categoryToKey
-string categoryEquip = "equip"
-string categoryConsume = "consume"
-string categoryEtc = "etc"
-string categoryCostume = "costume"
+string equipKey = "Equip"
+string consumeKey = "Consume"
+string materialKey = "Material"
+string costumeKey = "Costume"
+string equipStatusKey = "EquipStatus"
+string itemStatusKey = "ItemStatus"
+string uniqueIdKey = "UniqueId"
+number slotCnt = -1
+string equipCategory = nil
+string consumeCategory = nil
+string materialCategory = nil
+string costumeCategory = nil
+string equipStatus = nil
+string itemStatus = nil
+string emptyInvenJson = nil
+string emptyItemStatusJson = nil
+string emptyEquipStatusJson = nil
+string globalKey = "Global"
 
 
 --Methods--
@@ -21,80 +26,65 @@ string categoryCostume = "costume"
 [Server Only]
 void OnBeginPlay()
 {
-	-- category와 key 매칭
+	-- enum 불러오기
 	
-	self.categoryToKey[self.categoryEquip] = self.invenEquipKey
-	self.categoryToKey[self.categoryConsume] = self.invenConsumeKey
-	self.categoryToKey[self.categoryEtc] = self.invenEtcKey
-	self.categoryToKey[self.categoryCostume] = self.invenCostumeKey
+	self.slotCnt = _InventoryEnum.slotCnt
+	self.equipCategory = _InventoryEnum.equipCategory
+	self.consumeCategory = _InventoryEnum.consumeCategory
+	self.materialCategory = _InventoryEnum.materialCategory
+	self.costumeCategory = _InventoryEnum.costumeCategory
+	self.equipStatus = _InventoryEnum.equipStatus
+	self.itemStatus = _InventoryEnum.itemStatus
+	
+	self.categoryToKey[self.equipCategory] = self.equipKey
+	self.categoryToKey[self.consumeCategory] = self.consumeKey
+	self.categoryToKey[self.materialCategory] = self.materialKey
+	self.categoryToKey[self.costumeCategory] = self.costumeKey
+	
+	self.emptyInvenJson = self:GetEmptyInventoryJson()
+	self.emptyEquipStatusJson = self:GetEmptyEquipStatusJson()
+	self.emptyItemStatusJson = self:GetEmptyItemStatusJson()
 }
 
 [Server]
-void AddItem(string userId, string category, string itemCode)
+string GetEmptyInventoryJson()
 {
-	-- 아이템을 생성하여 유저의 인벤토리에 추가한다.
+	-- 빈 인벤토리 json을 생성한다.
 	
-	log("Add Item")
-	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, invenJson = db:GetAndWait(self.categoryToKey[category])
-	invenJson = invenJson or self:GetEmptyInventoryJson()
-	local inven = _HttpService:JSONDecode(invenJson)
-	local pos = nil
-	
-	if category == self.categoryEquip then
-		local _, equipPropJson = db:GetAndWait(self.equipPropKey)
-		equipPropJson = equipPropJson or "{}"
-		local equipProp = _HttpService:JSONDecode(equipPropJson)
-		
-		pos = self:GetEmptySpace(inven)
-		local id = self:GetUniqueID()
-		inven[pos] = id
-		invenJson = _HttpService:JSONEncode(inven)
-		db:SetAndWait(self.invenEquipKey, invenJson)
-		
-		equipProp[id] = {}
-		equipProp[id].code = itemCode
-		equipPropJson = _HttpService:JSONEncode(equipProp)
-		db:SetAndWait(self.equipPropKey, equipPropJson)
-	else
-		local _, itemPropJson = db:GetAndWait(self.itemPropKey)
-		itemPropJson = itemPropJson or "{}"
-		local itemProp = _HttpService:JSONDecode(itemPropJson)
-		
-		itemProp[category] = itemProp[category] or {}
-		itemProp[category][itemCode] = itemProp[category][itemCode] or {}
-		local cnt = itemProp[category][itemCode].cnt or 0
-		
-		if cnt > 0 then
-			pos = itemProp[category][itemCode].pos
-			itemProp[category][itemCode].cnt = itemProp[category][itemCode].cnt + 1
-		else
-			pos = self:GetEmptySpace(inven)
-			inven[pos] = itemCode
-			itemProp[category][itemCode].pos = pos
-			itemProp[category][itemCode].cnt = 1
-		end
-		
-	    itemPropJson = _HttpService:JSONEncode(itemProp)
-		db:SetAndWait(self.itemPropKey, itemPropJson)
-	end
-	
-	invenJson = _HttpService:JSONEncode(inven)
-	db:SetAndWait(self.categoryToKey[category], invenJson)
-	
-	self:UpdateUserData(userId)
-}
-
-[Server]
-number GetEmptySpace(table inven)
-{
-	-- 인벤토리에서 가장 앞에 있는 빈칸을 찾는다.
-	
+	local inven = {}
 	for i = 1, self.slotCnt do
-		if inven[i] == 0 then return i end
+		inven[i] = 0
 	end
 	
-	assert(false, "인벤토리에 빈 공간이 없습니다!")
+	local json = _HttpService:JSONEncode(inven)
+	return json
+}
+
+[Server]
+string GetEmptyItemStatusJson()
+{
+	-- 빈 itemStatus json을 생성한다.
+	
+	local status = {}
+	local categories = {self.consumeCategory, self.materialCategory, self.costumeCategory}
+	for _, category in ipairs(categories) do
+	    status[category] = {}
+		status[category]["0"] = "0"
+	end
+	
+	local json = _HttpService:JSONEncode(status)
+	return json
+}
+
+[Server]
+string GetEmptyEquipStatusJson()
+{
+	-- 빈 equipStatus json을 생성한다.
+	
+	local status = {}
+	status["0"] = "0"
+	local json = _HttpService:JSONEncode(status)
+	return json
 }
 
 [Server]
@@ -104,102 +94,195 @@ void ResetInventory(string userId)
 	
 	log("Reset Inven")
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	local emptyInvenJson = self:GetEmptyInventoryJson()
+	local emptyInvenJson = self.emptyInvenJson
+	local emptyEquipStatusJson = self.emptyEquipStatusJson
+	local emptyItemStatusJson = self.emptyItemStatusJson
 	
-	db:SetAndWait(self.invenEquipKey, emptyInvenJson)
-	db:SetAndWait(self.invenConsumeKey, emptyInvenJson)
-	db:SetAndWait(self.invenEtcKey, emptyInvenJson)
-	db:SetAndWait(self.invenCostumeKey, emptyInvenJson)
-	db:SetAndWait(self.equipPropKey, "{}")
-	db:SetAndWait(self.itemPropKey, "{}")
+	db:SetAndWait(self.equipKey, emptyInvenJson)
+	db:SetAndWait(self.consumeKey, emptyInvenJson)
+	db:SetAndWait(self.materialKey, emptyInvenJson)
+	db:SetAndWait(self.costumeKey, emptyInvenJson)
+	
+	db:SetAndWait(self.equipStatusKey, emptyEquipStatusJson)
+	db:SetAndWait(self.itemStatusKey, emptyItemStatusJson)
 	
 	self:UpdateUserData(userId)
 }
 
 [Server]
-string GetUniqueID()
+void AddItem(string userId, string category, string itemCode)
 {
-	local db = _DataStorageService:GetGlobalDataStorage(self.globalKey)
-	local _, IdString = db:GetAndWait(self.uniqueIdKey)
-	IdString = IdString or "1"
+	-- 인벤토리에 아이템을 추가한다.
 	
-	local id = tonumber(IdString)
-	local nextIdString = tostring(id + 1)
-	db:SetAndWait(self.uniqueIdKey, nextIdString)
-	
-	return IdString
-}
-
-[Server]
-void UpdateUserData(string userId)
-{
-	-- 특정 유저의 인벤토리 데이터를 갱신한다.
-	
+	log("add item")
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, invenEquipJson = db:GetAndWait(self.invenEquipKey)
-	local _, invenConsumeJson = db:GetAndWait(self.invenConsumeKey)
-	local _, invenEtcJson = db:GetAndWait(self.invenEtcKey)
-	local _, invenCostumeJson = db:GetAndWait(self.invenCostumeKey)
-	local _, equipPropJson = db:GetAndWait(self.equipPropKey)
-	local _, itemPropJson = db:GetAndWait(self.itemPropKey)
+	local invenKey = self.categoryToKey[category]
+	local _, invenJson = db:GetAndWait(invenKey)
+	local inven = _HttpService:JSONDecode(invenJson)
 	
-	local jsons = {}
-	local emptyInvenJson = self:GetEmptyInventoryJson()
-	jsons[1] = invenEquipJson or emptyInvenJson
-	jsons[2] = invenConsumeJson or emptyInvenJson
-	jsons[3] = invenEtcJson or emptyInvenJson
-	jsons[4] = invenCostumeJson or emptyInvenJson
-	jsons[5] = equipPropJson or "{}"
-	jsons[6] = itemPropJson or "{}"
-	local encodedJsons = _HttpService:JSONEncode(jsons)
+	if category == self.equipCategory then
+		local _, equipStatusJson = db:GetAndWait(self.equipStatusKey)
+		local equipStatus = _HttpService:JSONDecode(equipStatusJson)
+		
+		local pos = self:GetEmptySpace(invenJson)
+		local id = self:GetUniqueId()
+		inven[pos] = id
+		
+		invenJson = _HttpService:JSONEncode(inven)
+		db:SetAndWait(invenKey, invenJson)
+		
+		equipStatus[id] = {}
+		equipStatus[id].code = itemCode
+		equipStatusJson = _HttpService:JSONEncode(equipStatus)
+		db:SetAndWait(self.equipStatusKey, equipStatusJson)
+		
+	else
+		local _, itemStatusJson = db:GetAndWait(self.itemStatusKey)
+		local itemStatus = _HttpService:JSONDecode(itemStatusJson)
+		
+		if itemStatus[category][itemCode] then
+			itemStatus[category][itemCode].cnt = itemStatus[category][itemCode].cnt + 1
+		else
+			local pos = self:GetEmptySpace(invenJson)
+			inven[pos] = itemCode
+			itemStatus[category][itemCode] = {}
+			itemStatus[category][itemCode].pos = pos
+			itemStatus[category][itemCode].cnt = 1
+			
+			invenJson = _HttpService:JSONEncode(inven)
+			db:SetAndWait(invenKey, invenJson)
+		end
+		
+		itemStatusJson = _HttpService:JSONEncode(itemStatus)
+		db:SetAndWait(self.itemStatusKey, itemStatusJson)
+	end
 	
-	_InventoryClient:UpdateData(encodedJsons, userId)
+	self:UpdateUserData(userId)
 }
 
 [Server]
 void RemoveItem(string userId, string category, string itemId)
 {
-	-- 특정 유저의 인벤토리에서 특정 id의 아이템을 1개 제거한다.
+	-- 특정 id의 아이템을 하나 제거한다.
 	
-	log("remove item")
+	log("Remove Item")
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, invenJson = db:GetAndWait(self.categoryToKey[category])
-	invenJson = invenJson or self:GetEmptyInventoryJson()
+	local invenKey = self.categoryToKey[category]
+	local _, invenJson = db:GetAndWait(invenKey)
 	local inven = _HttpService:JSONDecode(invenJson)
 	
-	if category == self.categoryEquip then
-		assert(false, "아직 장비 삭제는 지원하지 않습니다.")
+	if category == self.equipCategory then
+		error("장비 삭제 아직 구현 중")
 	else
-		local _, itemPropJson = db:GetAndWait(self.itemPropKey)
-		itemPropJson = itemPropJson or "{}"
-		local itemProp = _HttpService:JSONDecode(itemPropJson)
-		itemProp[category] = itemProp[category] or {}
-		assert(itemProp[category][itemId] and itemProp[category][itemId].cnt > 0, "해당 아이템이 없습니다.")
-		itemProp[category][itemId].cnt = itemProp[category][itemId].cnt - 1
-		if itemProp[category][itemId].cnt <= 0 then
-			local pos = itemProp[category][itemId].pos
+		local _, itemStatusJson = db:GetAndWait(self.itemStatusKey)
+		local itemStatus = _HttpService:JSONDecode(itemStatusJson)
+		assert(itemStatus[category][itemId], "삭제할 아이템이 존재하지 않습니다!")
+		itemStatus[category][itemId].cnt = itemStatus[category][itemId].cnt - 1
+		if itemStatus[category][itemId].cnt <= 0 then
+			local pos = itemStatus[category][itemId].pos
 			inven[pos] = 0
-			itemProp[category][itemId] = nil
+			itemStatus[category][itemId] = nil
+			
 			invenJson = _HttpService:JSONEncode(inven)
-			db:SetAndWait(self.categoryToKey[category], invenJson)
+			db:SetAndWait(invenKey, invenJson)
 		end
-		itemPropJson = _HttpService:JSONEncode(itemProp)
-		db:SetAndWait(self.itemPropKey, itemPropJson)
+		
+		itemStatusJson = _HttpService:JSONEncode(itemStatus)
+		db:SetAndWait(self.itemStatusKey, itemStatusJson)
 	end
 	
 	self:UpdateUserData(userId)
 }
 
 [Server]
-string GetEmptyInventoryJson()
+void RemoveMultipleItems(string userId, string category, string itemCode, number cnt)
 {
-	local inven = {}
-	for i = 1, self.slotCnt do
-		inven[i] = 0
+	-- 특정 code의 아이템을 여러 개 제거한다.
+	
+	log("Remove multiple Items")
+	local db = _DataStorageService:GetUserDataStorage(userId)
+	local invenKey = self.categoryToKey[category]
+	local _, invenJson = db:GetAndWait(invenKey)
+	local inven = _HttpService:JSONDecode(invenJson)
+	
+	if category == self.equipCategory then
+		error("장비 삭제 아직 구현 중")
+	else
+		local _, itemStatusJson = db:GetAndWait(self.itemStatusKey)
+		local itemStatus = _HttpService:JSONDecode(itemStatusJson)
+		assert(itemStatus[category][itemCode] and itemStatus[category][itemCode].cnt >= cnt, "삭제할 아이템이 부족하거나 존재하지 않습니다!")
+		itemStatus[category][itemCode].cnt = itemStatus[category][itemCode].cnt - cnt
+		if itemStatus[category][itemCode].cnt <= 0 then
+			local pos = itemStatus[category][itemCode].pos
+			inven[pos] = 0
+			itemStatus[category][itemCode] = nil
+			
+			invenJson = _HttpService:JSONEncode(inven)
+			db:SetAndWait(invenKey, invenJson)
+		end
+		
+		itemStatusJson = _HttpService:JSONEncode(itemStatus)
+		db:SetAndWait(self.itemStatusKey, itemStatusJson)
 	end
 	
-	local invenJson = _HttpService:JSONEncode(inven)
-	return invenJson
+	self:UpdateUserData(userId)
+}
+
+[Server]
+number GetEmptySpace(string json)
+{
+	-- 인벤토리에서 가장 앞에 있는 빈 칸을 찾는다.
+	
+	local inven = _HttpService:JSONDecode(json)
+	for i = 1, self.slotCnt do
+		if inven[i] == 0 then return i end
+	end
+	
+	error("인벤토리에 빈 공간이 없습니다!")
+}
+
+[Server]
+string GetUniqueId()
+{
+	local db = _DataStorageService:GetGlobalDataStorage(self.globalKey)
+	local _, idString = db:GetAndWait(self.uniqueIdKey)
+	idString = idString or "1"
+	
+	local id = tonumber(idString)
+	local nextIdString = tostring(id + 1)
+	db:SetAndWait(self.uniqueIdKey, nextIdString)
+	
+	return idString
+}
+
+[Server]
+void UpdateUserData(string userId)
+{
+	local db = _DataStorageService:GetUserDataStorage(userId)
+	local _, equipJson = db:GetAndWait(self.equipKey)
+	local _, consumeJson = db:GetAndWait(self.consumeKey)
+	local _, materialJson = db:GetAndWait(self.materialKey)
+	local _, costumeJson = db:GetAndWait(self.costumeKey)
+	local _, equipStatusJson = db:GetAndWait(self.equipStatusKey)
+	local _, itemStatusJson = db:GetAndWait(self.itemStatusKey)
+	
+	local equip = _HttpService:JSONDecode(equipJson)
+	local consume = _HttpService:JSONDecode(consumeJson)
+	local material = _HttpService:JSONDecode(materialJson)
+	local costume = _HttpService:JSONDecode(costumeJson)
+	local equipStatus = _HttpService:JSONDecode(equipStatusJson)
+	local itemStatus = _HttpService:JSONDecode(itemStatusJson)
+	
+	local data = {}
+	data[self.equipCategory] = equip
+	data[self.consumeCategory] = consume
+	data[self.materialCategory] = material
+	data[self.costumeCategory] = costume
+	data[self.equipStatus] = equipStatus
+	data[self.itemStatus] = itemStatus
+	
+	local json = _HttpService:JSONEncode(data)
+	_InventoryClient:UpdateData(json, userId)
 }
 
 

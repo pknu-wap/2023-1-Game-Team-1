@@ -1,11 +1,12 @@
 --Properties--
 
-Entity reset
-Entity getElixir
-Entity getPowerElixir
+Entity getElixer
+Entity getPowerElixer
 Entity getSword
-Entity removeElixir
-Entity getScroll
+Entity rmElixer
+Entity rmPowerElixer
+Entity rmPowerElixer3
+Entity reset
 
 
 --Methods--
@@ -13,26 +14,20 @@ Entity getScroll
 [Client Only]
 void OnBeginPlay()
 {
-	self.reset:ConnectEvent("ButtonClickEvent", self.ResetInventory)
-	self.getElixir:ConnectEvent(ButtonClickEvent, function() self:GetItem("consume", "1") end)
-	self.getPowerElixir:ConnectEvent(ButtonClickEvent, function() self:GetItem("consume", "2") end)
-	self.getSword:ConnectEvent(ButtonClickEvent, function() self:GetItem("equip", "1") end)
-	self.removeElixir:ConnectEvent(ButtonClickEvent, function() self:RemoveItem("consume", "1") end)
-	self.getScroll:ConnectEvent(ButtonClickEvent, function() self:GetItem("etc", "1") end)
+	self.getElixer:ConnectEvent(ButtonClickEvent, function() self:AddItem("CategoryConsume", "1") end)
+	self.getPowerElixer:ConnectEvent(ButtonClickEvent, function() self:AddItem("CategoryConsume", "2") end)
+	self.getSword:ConnectEvent(ButtonClickEvent, function() self:AddItem("CategoryEquip", "1") end)
+	self.rmElixer:ConnectEvent(ButtonClickEvent, function() self:RemoveItem("CategoryConsume", "1") end)
+	self.rmPowerElixer:ConnectEvent(ButtonClickEvent, function() self:RemoveItem("CategoryConsume", "2") end)
+	self.rmPowerElixer3:ConnectEvent(ButtonClickEvent, function() self:RmItems("CategoryConsume", "2", 3) end)
+	self.reset:ConnectEvent(ButtonClickEvent, function() _InventoryServer:ResetInventory(_UserService.LocalPlayer.Name) end)
 }
 
 [Default]
-void ResetInventory()
+void AddItem(string category, string itemCode)
 {
 	local id = _UserService.LocalPlayer.Name
-	_InventoryServer:ResetInventory(id)
-}
-
-[Default]
-void GetItem(string category, string code)
-{
-	local id = _UserService.LocalPlayer.Name
-	_InventoryServer:AddItem(id, category, code)
+	_InventoryServer:AddItem(id, category, itemCode)
 }
 
 [Default]
@@ -40,6 +35,20 @@ void RemoveItem(string category, string itemId)
 {
 	local id = _UserService.LocalPlayer.Name
 	_InventoryServer:RemoveItem(id, category, itemId)
+}
+
+[Default]
+void RmItems(string category, string itemCode, number cnt)
+{
+	local id = _UserService.LocalPlayer.Name
+	_InventoryServer:RemoveMultipleItems(id, category, itemCode, cnt)
+}
+
+[Default]
+void Reset()
+{
+	local id = _UserService.LocalPlayer.Name
+	_InventoryServer:ResetInventory(id)
 }
 
 
