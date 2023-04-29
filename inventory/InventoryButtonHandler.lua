@@ -68,6 +68,7 @@ void ClickButton(string category)
 		self.texts[cate].FontColor = Color.FromHexCode(color)
 	end
 	
+	_InventorySlotHandler:Deselect()
 	_InventoryClient.currentCategory = category
 	_InventoryClient:UpdateUI(category)
 }

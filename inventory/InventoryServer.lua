@@ -8,7 +8,7 @@ string costumeKey = "Costume"
 string equipStatusKey = "EquipStatus"
 string itemStatusKey = "ItemStatus"
 string uniqueIdKey = "UniqueId"
-number slotCnt = -1
+number slotCnt = nil
 string equipCategory = nil
 string consumeCategory = nil
 string materialCategory = nil
@@ -283,6 +283,14 @@ void UpdateUserData(string userId)
 	
 	local json = _HttpService:JSONEncode(data)
 	_InventoryClient:UpdateData(json, userId)
+}
+
+[Server]
+void UpdateData(string userId, string category, string invenJson)
+{
+	local db = _DataStorageService:GetUserDataStorage(userId)
+	local invenKey = self.categoryToKey[category]
+	db:SetAndWait(invenKey, invenJson)
 }
 
 

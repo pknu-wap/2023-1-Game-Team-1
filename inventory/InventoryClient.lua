@@ -5,7 +5,6 @@ array<SpriteGUIRendererComponent> sprites
 array<TextComponent> texts
 table data
 table img
-number slotCnt = -1
 string equipDataSet = "EquipDataSet"
 string consumeDataSet = "ConsumeDataSet"
 string emptyImg = "3e9d52ed52d64794bbd6f72bab8ee3d9"
@@ -17,6 +16,7 @@ string costumeCategory = nil
 string equipStatus = nil
 string itemStatus = nil
 string userId = nil
+number slotCnt = nil
 
 
 --Methods--
@@ -56,10 +56,12 @@ void OnBeginPlay()
 	
 	-- 슬롯 생성 및 컴포넌트 저장
 	
+	self.slot.InventorySlot.idx = 1
 	self.sprites[1] = self.slot.Children[1].SpriteGUIRendererComponent
 	self.texts[1] = self.slot.Children[2].TextComponent
 	for i = 2, self.slotCnt do
 		local slot = self.slot:Clone(nil)
+		slot.InventorySlot.idx = i
 		self.sprites[i] = slot.Children[1].SpriteGUIRendererComponent
 		self.texts[i] = slot.Children[2].TextComponent
 	end
@@ -106,6 +108,18 @@ void UpdateData(string json)
 	local data = _HttpService:JSONDecode(json)
 	self.data = data
 	self:UpdateUI(self.currentCategory)
+}
+
+[Client]
+void Swap(number idx1, number idx2)
+{
+	local tmp = self.data[self.currentCategory][idx1]
+	self.data[self.currentCategory][idx1] = self.data[self.currentCategory][idx2]
+	self.data[self.currentCategory][idx2] = tmp
+	self:UpdateUI(self.currentCategory)
+	
+	local json = _HttpService:JSONEncode(self.data[self.currentCategory])
+	_InventoryServer:UpdateData(self.userId, self.currentCategory, json)
 }
 
 
