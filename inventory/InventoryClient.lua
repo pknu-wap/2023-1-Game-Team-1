@@ -84,7 +84,7 @@ void UpdateUI(string category)
 		local img = nil
 		local txt = nil
 		
-		if inven[i] == 0 then
+		if inven[i] == "0" then
 			img = self.emptyImg
 			txt = ""	
 		elseif category == self.equipCategory then
@@ -120,6 +120,27 @@ void Swap(number idx1, number idx2)
 	
 	local json = _HttpService:JSONEncode(self.data[self.currentCategory])
 	_InventoryServer:UpdateData(self.userId, self.currentCategory, json)
+}
+
+[Client]
+void Sort()
+{
+	-- 인벤토리를 정렬한다.
+	
+	log("sort")
+	if self.currentCategory == self.equipCategory then
+		error("아직 장비 정렬은 지원 X")
+	else
+	    table.sort(self.data[self.currentCategory], function(a, b)
+				if a == "0" then return false
+				elseif b == "0" then return true
+				else return a<b end
+		end)
+		self:UpdateUI(self.currentCategory)
+		
+		local json = _HttpService:JSONEncode(self.data[self.currentCategory])
+		_InventoryServer:UpdateData(self.userId, self.currentCategory, json)
+	end
 }
 
 

@@ -53,7 +53,7 @@ string GetEmptyInventoryJson()
 	
 	local inven = {}
 	for i = 1, self.slotCnt do
-		inven[i] = 0
+		inven[i] = "0"
 	end
 	
 	local json = _HttpService:JSONEncode(inven)
@@ -235,7 +235,7 @@ number GetEmptySpace(string json)
 	
 	local inven = _HttpService:JSONDecode(json)
 	for i = 1, self.slotCnt do
-		if inven[i] == 0 then return i end
+		if inven[i] == "0" then return i end
 	end
 	
 	error("인벤토리에 빈 공간이 없습니다!")
