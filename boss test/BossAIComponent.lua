@@ -76,6 +76,8 @@ void OnBeginPlay()
 	root:AttachChild(repeater)
 	
 	self:SetRootNode(root)
+	
+	self:GetPlayer()
 }
 
 [Server]

@@ -21,10 +21,11 @@ any OnBehave(number delta)
 {
 	
 	if self.target == nil then
-		self.BossAIComponent:SetPlayer()
+		log("CanAttack 안댐" ..self.ParentAI.Entity.Name)
 		return BehaviourTreeStatus.Failure
 	end
 	
+	log("CanAttack 댐" ..self.ParentAI.Entity.Name)
 	return BehaviourTreeStatus.Success
 }
 

@@ -47,7 +47,7 @@ void Dead()
 	
 	local delayHide = function()
 		self.Entity:SetVisible(false)
-		self.Entity:SetEnable(false)
+		--self.Entity:SetEnable(false)
 	end
 	
 	_TimerService:SetTimerOnce(delayHide, self.DestroyDelay)

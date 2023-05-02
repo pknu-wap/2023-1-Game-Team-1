@@ -78,6 +78,15 @@ void SpawnExplosionStone()
 	_SpawnService:SpawnByModelId("model://81f059a4-e74d-4d59-bca3-dc9a41faf888", "BoomStone", Vector3(transform.Position.x, -0.8, transform.Position.z), self.Entity.Parent)
 }
 
+[Default]
+void SpawnPhase2()
+{
+	local transformComponent = self.Entity.TransformComponent
+	
+	_SpawnService:SpawnByModelId("model://be5ee7cd-c8c2-445a-8395-750f637ab08b", "Boss_Stump_Phase2", Vector3(transformComponent.Position.x, transformComponent.Position.y, transformComponent.Position.z), self.Entity.Parent)
+	self.Entity:Destroy()
+}
+
 
 --Events--
 
@@ -117,6 +126,30 @@ HandleStump_Pattern_Event(Stump_Pattern_Event event)
 			self.BossComponent.stateComponent:ChangeState("ATTACK3")
 			self:AttackStateTimer(3)
 		end
+	end
+}
+
+[Default]
+HandleStateChangeEvent(StateChangeEvent event)
+{
+	--------------- Native Event Sender Info ----------------
+	-- Sender: StateComponent
+	-- Space: Server, Client
+	---------------------------------------------------------
+	
+	-- Parameters
+	local CurrentStateName = event.CurrentStateName
+	local PrevStateName = event.PrevStateName
+	---------------------------------------------------------
+	if CurrentStateName == "DEAD" then
+		local transformComponent = self.Entity.TransformComponent
+	
+		local spawnEffect = function()
+			_EffectService:PlayEffect("03a9f80819c542fe8e2ec00d2d763651", self.Entity, transformComponent.Position, 0, Vector3.one*3, false)
+			_TimerService:SetTimerOnce(function() self:SpawnPhase2() end, 2)
+		end
+		
+		_TimerService:SetTimerOnce(spawnEffect, 1.8)
 	end
 }
 
