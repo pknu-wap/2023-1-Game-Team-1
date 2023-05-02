@@ -180,7 +180,7 @@ void RemoveItem(string userId, string category, string itemId)
 		itemStatus[category][itemId].cnt = itemStatus[category][itemId].cnt - 1
 		if itemStatus[category][itemId].cnt <= 0 then
 			local pos = itemStatus[category][itemId].pos
-			inven[pos] = 0
+			inven[pos] = "0"
 			itemStatus[category][itemId] = nil
 			
 			invenJson = _HttpService:JSONEncode(inven)
@@ -214,7 +214,7 @@ void RemoveMultipleItems(string userId, string category, string itemCode, number
 		itemStatus[category][itemCode].cnt = itemStatus[category][itemCode].cnt - cnt
 		if itemStatus[category][itemCode].cnt <= 0 then
 			local pos = itemStatus[category][itemCode].pos
-			inven[pos] = 0
+			inven[pos] = "0"
 			itemStatus[category][itemCode] = nil
 			
 			invenJson = _HttpService:JSONEncode(inven)
