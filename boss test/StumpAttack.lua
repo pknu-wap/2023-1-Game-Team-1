@@ -26,8 +26,8 @@ void teleport()
 {
 	
 	local targetTransform = self.BossAIComponent.target.TransformComponent.Position
-		
-	self.BossComponent.BossMovementComponent:SetPosition(Vector2(targetTransform.x, targetTransform.y))
+	
+	self.BossComponent.BossMovementComponent:SetPosition(Vector2(targetTransform.x, self.BossComponent.BossTransformComponent.Position.y))
 	
 	local atatckBox = function()
 		local attackSize = Vector2(1, 0.1)
@@ -70,6 +70,14 @@ void SpawnSpirit()
 	end
 }
 
+[Default]
+void SpawnExplosionStone()
+{
+	local transform = self.BossAIComponent.target.TransformComponent
+	
+	_SpawnService:SpawnByModelId("model://81f059a4-e74d-4d59-bca3-dc9a41faf888", "BoomStone", Vector3(transform.Position.x, -0.8, transform.Position.z), self.Entity.Parent)
+}
+
 
 --Events--
 
@@ -79,7 +87,6 @@ HandleStump_Pattern_Event(Stump_Pattern_Event event)
 	-- Parameters
 	local PtNo = event.PtNo
 	---------------------------------------------------------
-	log("스텀프 패턴 이벤트 발생 "..PtNo)
 	
 	if self.BossComponent.InRange then
 		if PtNo >= 0 and PtNo <= 9 then
@@ -92,15 +99,21 @@ HandleStump_Pattern_Event(Stump_Pattern_Event event)
 		
 		self:AttackStateTimer(3)
 	else
+		PtNo = 5
 		if PtNo >= 0 and PtNo <= 2 then
 			--self:teleport()
 			self.attackName = "teleport"
 			_TimerService:SetTimerOnce(function() self:teleport() end, 0.9)
 			self:AttackStateTimer(3)
 			self.BossComponent.stateComponent:ChangeState("ATTACK1")
-		elseif PtNo > 2 then
+		elseif PtNo > 2 and PtNo <= 4 then
 			self.attackName = "spawnSpirit"
 			_TimerService:SetTimerOnce(function() self:SpawnSpirit() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+			self:AttackStateTimer(3)
+		elseif PtNo > 4 then
+			self.attackName = "BoomStone"
+			_TimerService:SetTimerOnce(function() self:SpawnExplosionStone() end, 0.9)
 			self.BossComponent.stateComponent:ChangeState("ATTACK3")
 			self:AttackStateTimer(3)
 		end

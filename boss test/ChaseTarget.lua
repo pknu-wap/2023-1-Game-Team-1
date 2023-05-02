@@ -13,7 +13,6 @@ number distance = 2
 [Default]
 void OnInit()
 {
-	log("ChaseTarget 의 시작입니다!")
 	self.target = self.ParentAI.Entity.BossAIComponent.target
 	self.targetTransform = self.target.TransformComponent
 	
@@ -48,21 +47,20 @@ any OnBehave(number delta)
 	self.time = self.time - delta
 	--log("남은 추적 시간 " ..self.time)
 	if math.abs(dir.x) < self.BossAIComponent.detectDistance then
-		log("타겟 범위 안")
+		--log("타겟 범위 안")
 		self.BossAIComponent.BossComponent.BossMovementComponent.InputSpeed = 0
 		--self.ExclusiveExecutionWhenRunning = false
 		self.BossAIComponent.BossComponent.InRange = true
 		return BehaviourTreeStatus.Success
 	
 	elseif	self.time < 0 then
-		log("타겟 범위 밖 시간 오버")
+		--log("타겟 범위 밖 시간 오버")
 		self.BossAIComponent.BossComponent.BossMovementComponent.InputSpeed = 0
 		--self.ExclusiveExecutionWhenRunning = false
 		self.BossAIComponent.BossComponent.InRange = false
 		return BehaviourTreeStatus.Success
 	end
 	
-	log("쫓아가는 중...." ..self.ParentAI.Entity.StateComponent.CurrentStateName)
 	return BehaviourTreeStatus.Running
 }
 

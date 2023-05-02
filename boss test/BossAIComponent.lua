@@ -87,11 +87,10 @@ void GetPlayer()
 	--log("GetPlayer 찾는중")
 	for i, p in pairs(playersArr) do
 		self.player[i] = p
-		log(i.."번째" .. p.Name)
 		log(i.."번째의 player " .. self.player[i].Name)
 	end
 	
-	--self:SetPlayer()
+	self:SetPlayer()
 }
 
 [Server]
@@ -99,10 +98,11 @@ void SetPlayer()
 {
 	local dist
 	
-	if self.target == nil then
-		dist = math.maxinteger
-	else
+	if isvalid(self.target) then
 		dist = Vector2.Distance(self.target.TransformComponent.Position:ToVector2(), self.Entity.TransformComponent.Position:ToVector2())
+	else
+		dist = math.maxinteger
+		log("타겟 재설정")
 	end
 	
 	--og("어디서 오류 ? 1")
@@ -115,7 +115,7 @@ void SetPlayer()
 			if isvalid(p) then
 				--log("어디서 오류 ? 4")
 				if p == self.target then
-					log("같은 타겟입니다! 스킵합니다.")
+					log("같은 타겟입니다! 스킵합니다." ..p.Name .." , " ..self.target.Name)
 					goto skip_set_target
 				end
 				
@@ -125,21 +125,12 @@ void SetPlayer()
 					goto skip_set_target
 				end
 				
-				dist = math.min(dist, distTemp)
-				
-				if dist <= self.detectDistance then
-					self.target = p
-					log("타겟 설정 " ..self.target.Name)
-				end
-				
+				dist = distTemp
+				self.target = p
 				::skip_set_target::
 			end
 		end
 		
-	end
-	
-	if self.target ~= nil then
-		CanAttack().target = self.target
 	end
 }
 

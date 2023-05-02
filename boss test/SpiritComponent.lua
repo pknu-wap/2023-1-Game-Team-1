@@ -4,6 +4,7 @@ number MaxHp = 100
 number CurrentHp = 0
 number Damage = 200
 number delayTime = 0.03
+boolean attackOn = false
 
 
 --Methods--
@@ -20,6 +21,7 @@ void OnBeginPlay()
 	-- sprite 사이즈를 가져와 공격 영역으로 사용한다
 	local treeStart = function()
 		self.Entity.SpriteRendererComponent.SpriteRUID = "01d0d3816cca4992bc4a71e7c93601e4"
+		self.attackOn = true
 		
 		_ResourceService:PreloadAsync({self.Entity.SpriteRendererComponent.SpriteRUID}, function()
 			local clip = _ResourceService:LoadAnimationClipAndWait(self.Entity.SpriteRendererComponent.SpriteRUID)
@@ -30,11 +32,6 @@ void OnBeginPlay()
 			self._T.spriteSize = firstSpriteSizeInPixel / ppu
 			self._T.positionOffset = (firstSpriteSizeInPixel / 2 - firstFrameSprite.PivotPixel:ToVector2()) / ppu
 			
-			_TimerService:SetTimerRepeat(function() 
-				if self.CurrentHp > 0 then
-					self:AttackNear()
-				end
-			end, self.delayTime)
 		end)
 	end
 	
@@ -54,15 +51,20 @@ void AttackNear()
 		local radian = math.rad(transformComponent.ZRotation)
 		local offsetX = math.cos(radian) * self._T.positionOffset.x * scaleX - math.sin(radian) * self._T.positionOffset.y * scaleY
 		local offsetY = math.sin(radian) * self._T.positionOffset.x * scaleX + math.cos(radian) * self._T.positionOffset.y * scaleY
-		self._T.shape.Size = Vector2(self._T.spriteSize.x * math.abs(scaleX), self._T.spriteSize.y * math.abs(scaleY))
+		self._T.shape.Size = Vector2(self._T.spriteSize.x * math.abs(scaleX)-0.5, self._T.spriteSize.y * math.abs(scaleY))
 		self._T.shape.Position = Vector2(worldPosition.x + offsetX, worldPosition.y + offsetY)
 		self._T.shape.Angle = transformComponent.ZRotation
 	end
 	
+	--local attackSize = Vector2(1, 0.1)
+	--	local attackOffset = Vector2(0, 0)
+		
+	--	self:Attack(attackSize, attackOffset, nil, CollisionGroups.Player)
+	
 	self:AttackFast(self._T.shape, nil, CollisionGroups.Player)
 }
 
-[Default]
+[Server]
 void Destroy()
 {
 	local stateComponent = self.Entity.StateComponent
@@ -90,7 +92,7 @@ integer CalcDamage(Entity attacker, Entity defender, string attackInfo)
 
 --Events--
 
-[Default]
+[Server Only]
 HandleHitEvent(HitEvent event)
 {
 	--------------- Native Event Sender Info ----------------
@@ -115,6 +117,27 @@ HandleHitEvent(HitEvent event)
 		return	
 	end
 	
-	self:Destroy()
+	--self:Destroy()
+	self.Entity:Destroy()
+}
+
+[Default]
+HandleTriggerStayEvent(TriggerStayEvent event)
+{
+	--------------- Native Event Sender Info ----------------
+	-- Sender: TriggerComponent
+	-- Space: Server, Client
+	---------------------------------------------------------
+	
+	-- Parameters
+	local TriggerBodyEntity = event.TriggerBodyEntity
+	---------------------------------------------------------
+	if isvalid(TriggerBodyEntity.PlayerComponent) and self.attackOn then
+		_TimerService:SetTimerRepeat(function() 
+				if self.CurrentHp > 0 then
+					self:AttackNear()
+				end
+			end, self.delayTime)
+	end
 }
 
