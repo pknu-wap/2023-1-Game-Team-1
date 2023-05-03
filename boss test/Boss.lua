@@ -30,6 +30,7 @@ void OnBeginPlay()
 	self.BossTransformComponent = self.Entity.TransformComponent
 	self.SpriteComponent = self.Entity.SpriteRendererComponent
 	self.attackEnd = true
+	self.stateComponent:RemoveState("HIT")
 	
 	--log("현재 체력 " ..self.Hp)
 }
@@ -41,12 +42,12 @@ void Dead()
 	
 	if self.stateComponent then
 		self.stateComponent:ChangeState("DEAD")
-		log("죽음")
+		--log("죽음")
 	end
 	
 	local delayHide = function()
 		self.Entity:SetVisible(false)
-		self.Entity:SetEnable(false)
+		--self.Entity:SetEnable(false)
 	end
 	
 	_TimerService:SetTimerOnce(delayHide, self.DestroyDelay)
@@ -63,7 +64,7 @@ void Hit()
 [Server Only]
 void OnUpdate(number delta)
 {
-	log("보스 현재 스테이트 상태 : " ..self.stateComponent.CurrentStateName)
+	--log("보스 현재 스테이트 상태 : " ..self.stateComponent.CurrentStateName)
 }
 
 

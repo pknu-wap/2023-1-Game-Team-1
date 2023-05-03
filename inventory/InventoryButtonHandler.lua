@@ -4,6 +4,7 @@ Entity equipButton
 Entity consumeButton
 Entity materialButton
 Entity costumeButton
+Entity sortButton
 dictionary<string, Entity> buttons
 dictionary<string, SpriteGUIRendererComponent> sprites
 string equipCategory = nil
@@ -46,6 +47,7 @@ void OnBeginPlay()
 	for category, button in pairs(self.buttons) do
 		button:ConnectEvent(ButtonClickEvent, function() self:ClickButton(category) end)
 	end
+	self.sortButton:ConnectEvent(ButtonClickEvent, function() _InventoryClient:Sort() end)
 }
 
 [Client]
@@ -55,7 +57,7 @@ void ClickButton(string category)
 	
 	for cate, sprite in pairs(self.sprites) do
 		local img, color
-	
+		
 		if category == cate then
 			img = self.pressedImg
 			color = self.pressedColor
@@ -68,6 +70,7 @@ void ClickButton(string category)
 		self.texts[cate].FontColor = Color.FromHexCode(color)
 	end
 	
+	_InventorySlotHandler:Deselect()
 	_InventoryClient.currentCategory = category
 	_InventoryClient:UpdateUI(category)
 }

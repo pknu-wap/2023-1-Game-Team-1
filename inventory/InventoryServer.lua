@@ -8,7 +8,7 @@ string costumeKey = "Costume"
 string equipStatusKey = "EquipStatus"
 string itemStatusKey = "ItemStatus"
 string uniqueIdKey = "UniqueId"
-number slotCnt = -1
+number slotCnt = nil
 string equipCategory = nil
 string consumeCategory = nil
 string materialCategory = nil
@@ -53,7 +53,7 @@ string GetEmptyInventoryJson()
 	
 	local inven = {}
 	for i = 1, self.slotCnt do
-		inven[i] = 0
+		inven[i] = "0"
 	end
 	
 	local json = _HttpService:JSONEncode(inven)
@@ -180,7 +180,7 @@ void RemoveItem(string userId, string category, string itemId)
 		itemStatus[category][itemId].cnt = itemStatus[category][itemId].cnt - 1
 		if itemStatus[category][itemId].cnt <= 0 then
 			local pos = itemStatus[category][itemId].pos
-			inven[pos] = 0
+			inven[pos] = "0"
 			itemStatus[category][itemId] = nil
 			
 			invenJson = _HttpService:JSONEncode(inven)
@@ -214,7 +214,7 @@ void RemoveMultipleItems(string userId, string category, string itemCode, number
 		itemStatus[category][itemCode].cnt = itemStatus[category][itemCode].cnt - cnt
 		if itemStatus[category][itemCode].cnt <= 0 then
 			local pos = itemStatus[category][itemCode].pos
-			inven[pos] = 0
+			inven[pos] = "0"
 			itemStatus[category][itemCode] = nil
 			
 			invenJson = _HttpService:JSONEncode(inven)
@@ -235,7 +235,7 @@ number GetEmptySpace(string json)
 	
 	local inven = _HttpService:JSONDecode(json)
 	for i = 1, self.slotCnt do
-		if inven[i] == 0 then return i end
+		if inven[i] == "0" then return i end
 	end
 	
 	error("인벤토리에 빈 공간이 없습니다!")
@@ -283,6 +283,14 @@ void UpdateUserData(string userId)
 	
 	local json = _HttpService:JSONEncode(data)
 	_InventoryClient:UpdateData(json, userId)
+}
+
+[Server]
+void UpdateData(string userId, string category, string invenJson)
+{
+	local db = _DataStorageService:GetUserDataStorage(userId)
+	local invenKey = self.categoryToKey[category]
+	db:SetAndWait(invenKey, invenJson)
 }
 
 

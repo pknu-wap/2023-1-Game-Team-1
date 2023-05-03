@@ -9,6 +9,7 @@ Component BossAIComponent
 [Default]
 void OnInit()
 {
+	self.BossAIComponent = self.ParentAI.Entity.BossAIComponent
 	self.ExclusiveExecutionWhenRunning = true
 }
 
@@ -16,8 +17,8 @@ void OnInit()
 any OnBehave(number delta)
 {
 	--log("PtNo : 성공 ")-- ..self.PtNo)
-	if self.ParentAI.Entity.StateComponent.CurrentStateName ~= "CHASE" then
-		log("움직이지 않습니다")
+	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName ~= "CHASE" then
+		log("움직이지 않습니다 ")
 		return BehaviourTreeStatus.Failure
 	end
 	
