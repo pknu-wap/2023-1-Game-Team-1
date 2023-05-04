@@ -1,7 +1,8 @@
 --Properties--
 
 Component state
-number delay = 1.5
+number startDelay = 0
+number totalDelay = 1.5
 Vector2 attackSize = Vector2(14,8)
 Vector2 attackOffset = Vector2(0,0)
 integer timerId = 0
@@ -15,8 +16,28 @@ void OnBeginPlay()
 	self.state = _UserService.LocalPlayer.StateComponent
 }
 
+[Client]
+void PreSkill()
+{
+	if self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
+	self.state:ChangeState("SKILL")
+	self.timerId = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay)
+}
+
+[Client]
+void UseSkillClient()
+{
+	self:UseSkillServer(_UserService.LocalPlayer)
+	local e1 = ActionStateChangedEvent("swingT3", "swingT3", 0.1, SpriteAnimClipPlayType.Onetime)
+	local e2 = ActionStateChangedEvent("swingT1", "swingT1", 1.5, SpriteAnimClipPlayType.Onetime)
+	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay)
+	_ActionChange:SendToServer(_UserService.LocalPlayer, e1)
+	_TimerService:SetTimerOnce(function() _ActionChange:SendToServer(_UserService.LocalPlayer, e2) end, 0.85)
+	_SoundService:PlaySound("b9c62d5fa12f461889d3392164112234", 0.75)
+}
+
 [Server]
-void PlayEffectAndAttack(Entity player)
+void UseSkillServer(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
 	local camera = player.CameraComponent
@@ -25,20 +46,6 @@ void PlayEffectAndAttack(Entity player)
 	_TimerService:SetTimerOnce(function()
 			player.AttackComponent:Attack(self.attackSize, self.attackOffset, "UltimateSkill", CollisionGroups.Monster)
 		end, 2.0)
-}
-
-[Client]
-void UseSkill()
-{
-	if self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
-	self.state:ChangeState("SKILL")
-	self:PlayEffectAndAttack(_UserService.LocalPlayer)
-	local e1 = ActionStateChangedEvent("swingT3", "swingT3", 0.1, SpriteAnimClipPlayType.Onetime)
-	local e2 = ActionStateChangedEvent("swingT1", "swingT1", 1.5, SpriteAnimClipPlayType.Onetime)
-	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.delay)
-	_ActionChange:SendToServer(_UserService.LocalPlayer, e1)
-	_TimerService:SetTimerOnce(function() _ActionChange:SendToServer(_UserService.LocalPlayer, e2) end, 0.85)
-	_SoundService:PlaySound("b9c62d5fa12f461889d3392164112234", 0.75)
 }
 
 [Client Only]

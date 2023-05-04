@@ -28,43 +28,43 @@ void OnBeginPlay()
 [Default]
 void Skill1()
 {
-	self.skill1:UseSkill()
+	self.skill1:PreSkill()
 }
 
 [Default]
 void Skill2()
 {
-	self.skill2:UseSkill()
+	self.skill2:PreSkill()
 }
 
 [Default]
 void Skill3()
 {
-	self.skill3:UseSkill()
+	self.skill3:PreSkill()
 }
 
 [Default]
 void Skill4()
 {
-	self.skill4:UseSkill()
+	self.skill4:PreSkill()
 }
 
 [Default]
 void Skill5()
 {
-	self.skill5:UseSkill()
+	self.skill5:PreSkill()
 }
 
 [Default]
 void UltimateSkill()
 {
-	self.ultimateSkill:UseSkill()
+	self.ultimateSkill:PreSkill()
 }
 
 [Default]
 void Dash()
 {
-	self.dash:UseSkill()
+	self.dash:PreSkill()
 }
 
 
