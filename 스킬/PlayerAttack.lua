@@ -1,5 +1,6 @@
 --Properties--
 
+any skillData = nil
 
 
 --Methods--
@@ -8,6 +9,7 @@
 void OnBeginPlay()
 {
 	self._T.shape = BoxShape(Vector2.zero, Vector2.one, 0)
+	self.skillData = _DataService:GetTable("SwordSkillData")
 }
 
 [Server Only]

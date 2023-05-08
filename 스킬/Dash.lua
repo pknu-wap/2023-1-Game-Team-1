@@ -1,24 +1,41 @@
 --Properties--
 
+string skillName = "SwordDash"
 Component state
 Component rigidbody
 Component controller
-number dashForce = 15
-number jumpForce = 10
+number dashForce = 0
+number jumpForce = 0
 number startDelay = 0
-number totalDelay = 0.3
+number totalDelay = 0
 integer timerId = 0
+table effectRUID
+string soundRUID = ""
 boolean jumpFlag = true
 
 
 --Methods--
 
-[Client Only]
+[Default]
 void OnBeginPlay()
 {
-	self.state = _UserService.LocalPlayer.StateComponent
-	self.rigidbody = _UserService.LocalPlayer.RigidbodyComponent
-	self.controller = _UserService.LocalPlayer.PlayerControllerComponent
+	if self:IsClient() then
+		self.state = _UserService.LocalPlayer.StateComponent
+		self.rigidbody = _UserService.LocalPlayer.RigidbodyComponent
+		self.controller = _UserService.LocalPlayer.PlayerControllerComponent
+	end
+	
+	local skillData = _DataService:GetTable("DashData")
+	local row = skillData:FindRow("Name", self.skillName)
+	
+	self.dashForce = tonumber(row:GetItem("DashForce"))
+	self.jumpForce = tonumber(row:GetItem("JumpForce"))
+	self.startDelay = tonumber(row:GetItem("StartDelay"))
+	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
+	self.effectRUID = _DataSetToTable:GetStringTable(row:GetItem("EffectRUID"))
+	self.soundRUID = row:GetItem("SoundRUID")
+	
+	self.jumpFlag = true
 }
 
 [Client]
@@ -39,10 +56,12 @@ void UseSkillClient()
 		self.jumpFlag = false
 		self:UseSkillServer1(_UserService.LocalPlayer)
 		self.rigidbody:SetForce(Vector2(self.rigidbody.RealMoveVelocity.x * 50, self.jumpForce))
+		_SoundService:PlaySound(self.soundRUID, 0.75)
 	else
 		self.state:ChangeState("SKILL")
 		self:UseSkillServer2(_UserService.LocalPlayer)
 		self.rigidbody:SetForce(Vector2(self.dashForce , 0) * self.controller.LookDirectionX)
+		_SoundService:PlaySound(self.soundRUID, 0.75)
 	end
 }
 
@@ -50,14 +69,14 @@ void UseSkillClient()
 void UseSkillServer1(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
-	_EffectService:PlayEffectAttached("af166c03cbbd4c82b128f1ad8f3cbaf4", player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
+	_EffectService:PlayEffectAttached(self.effectRUID[1], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
 }
 
 [Server]
 void UseSkillServer2(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
-	_EffectService:PlayEffectAttached("114cfd8a5b0842f1a21432d386f3c7fc", player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
+	_EffectService:PlayEffectAttached(self.effectRUID[2], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
 }
 
 [Client Only]

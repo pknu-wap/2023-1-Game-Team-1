@@ -1,26 +1,50 @@
 --Properties--
 
+string skillName = "Skill1"
 Component state
+number coefficient = 0
 number startDelay = 0
-number totalDelay = 0.7
-Vector2 attackSize = Vector2(1.5,1.25)
-Vector2 attackOffset = Vector2(0.75,0)
+number totalDelay = 0
+Vector2 attackSize = Vector2(0,0)
+Vector2 attackOffset = Vector2(0,0)
 integer timerId = 0
+number remainCoolTime = 0
+number skillCoolTime = 0
+string effectRUID = ""
+string hitEffectRUID = ""
+string soundRUID = ""
+string hitSoundRUID = ""
 
 
 --Methods--
 
-[Client Only]
+[Default]
 void OnBeginPlay()
 {
-	self.state = _UserService.LocalPlayer.StateComponent
+	if self:IsClient() then
+		self.state = _UserService.LocalPlayer.StateComponent
+	end
+	
+	local skillData = _DataService:GetTable("SwordSkillData")
+	local row = skillData:FindRow("Name", self.skillName)
+	self.coefficient = tonumber(row:GetItem("Coefficient"))
+	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))
+	self.attackOffset = Vector2(tonumber(row:GetItem("AttackOffset.x")), tonumber(row:GetItem("AttackOffset.y")))
+	self.skillCoolTime = tonumber(row:GetItem("CoolTime"))
+	self.startDelay = tonumber(row:GetItem("StartDelay"))
+	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
+	self.effectRUID = row:GetItem("EffectRUID")
+	self.hitEffectRUID = row:GetItem("HitEffectRUID")
+	self.soundRUID = row:GetItem("SoundRUID")
+	self.hitSoundRUID = row:GetItem("HitSoundRUID")
 }
 
 [Client]
 void PreSkill()
 {
-	if self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
+	if self.remainCoolTime > 0 or self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
 	self.state:ChangeState("SKILL")
+	self:CalcCoolTime()
 	self.timerId = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay)
 }
 
@@ -31,14 +55,14 @@ void UseSkillClient()
 	local e = ActionStateChangedEvent("swingT3", "swingT3", 1.25, SpriteAnimClipPlayType.Onetime)
 	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay)
 	_ActionChange:SendToServer(_UserService.LocalPlayer, e)
-	_SoundService:PlaySound("27bc0369186844eca452cf461427d4ef", 0.75)
+	_SoundService:PlaySound(self.soundRUID, 0.75)
 }
 
 [Server]
 void UseSkillServer(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
-	_EffectService:PlayEffectAttached("90f6fed910d4442bac874bf1133fa7a3", player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
+	_EffectService:PlayEffectAttached(self.effectRUID, player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
 	_TimerService:SetTimerOnce(function() 	
 		player.AttackComponent:Attack(self.attackSize, self.attackOffset * player.PlayerControllerComponent.LookDirectionX, "Skill1", CollisionGroups.Monster)
 	end, 0.25)
@@ -50,6 +74,19 @@ void ChangeStateToIDLE()
 	if self.state.CurrentStateName == "SKILL" then
 		self.state:ChangeState("IDLE")
 	end
+}
+
+[Client]
+void CalcCoolTime()
+{
+	self.remainCoolTime = self.skillCoolTime
+	local coolTimer = 0
+	local CheckCoolTime = function()
+		self.remainCoolTime = self.remainCoolTime - 1
+		log(self.remainCoolTime)
+		if self.remainCoolTime <= 0 then _TimerService:ClearTimer(coolTimer) end
+		end
+	coolTimer = _TimerService:SetTimerRepeat(CheckCoolTime, 1, 1)
 }
 
 

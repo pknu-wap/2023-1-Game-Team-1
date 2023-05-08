@@ -1,37 +1,62 @@
 --Properties--
 
+string skillName = "Skill4"
 Component state
 Component rigidbody
 Component controller
+table coefficient
 number startDelay = 0
-number totalDelay = 1.9
-Vector2 attackSize1 = Vector2(3,0.5)
-Vector2 attackOffset1 = Vector2(1.5,0)
-Vector2 attackSize2 = Vector2(4.5,0.75)
-Vector2 attackOffset2 = Vector2(1.25,0)
-Vector2 attackSize3 = Vector2(1.5,1.25)
-Vector2 attackOffset3 = Vector2(0.75,0)
-integer timerId1 = 0
+number totalDelay = 0
+table attackSize
+table attackOffset
+integer timerId = 0
 integer timerId2 = 0
 integer timerId3 = 0
+number remainCoolTime = 0
+number skillCoolTime = 0
+table effectRUID
+table hitEffectRUID
+table soundRUID
+table hitSoundRUID
 
 
 --Methods--
 
-[Client Only]
+[Default]
 void OnBeginPlay()
 {
-	self.state = _UserService.LocalPlayer.StateComponent
-	self.rigidbody = _UserService.LocalPlayer.RigidbodyComponent
-	self.controller = _UserService.LocalPlayer.PlayerControllerComponent
+	if self:IsClient() then 
+		self.state = _UserService.LocalPlayer.StateComponent
+		self.rigidbody = _UserService.LocalPlayer.RigidbodyComponent
+		self.controller = _UserService.LocalPlayer.PlayerControllerComponent
+	end
+	
+	local skillData = _DataService:GetTable("SwordSkillData")
+	local row = skillData:FindRow("Name", self.skillName)
+	local attackSizeX = _DataSetToTable:GetNumberTable(row:GetItem("AttackSize.x"))
+	local attackSizeY = _DataSetToTable:GetNumberTable(row:GetItem("AttackSize.y"))
+	local attackOffsetX = _DataSetToTable:GetNumberTable(row:GetItem("AttackOffset.x"))
+	local attackOffsetY = _DataSetToTable:GetNumberTable(row:GetItem("AttackOffset.y"))
+	
+	self.coefficient = _DataSetToTable:GetNumberTable(row:GetItem("Coefficient"))
+	self.attackSize = {Vector2(attackSizeX[1], attackSizeY[2]), Vector2(attackSizeX[2], attackSizeY[2]), Vector2(attackSizeX[3], attackSizeY[3])}
+	self.attackOffset = {Vector2(attackOffsetX[1], attackOffsetY[2]), Vector2(attackOffsetX[2], attackOffsetY[2]), Vector2(attackOffsetX[3], attackOffsetY[3])}
+	self.skillCoolTime = tonumber(row:GetItem("CoolTime"))
+	self.startDelay = tonumber(row:GetItem("StartDelay"))
+	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
+	self.effectRUID = _DataSetToTable:GetStringTable(row:GetItem("EffectRUID"))
+	self.hitEffectRUID = _DataSetToTable:GetStringTable(row:GetItem("HitEffectRUID"))
+	self.soundRUID = _DataSetToTable:GetStringTable(row:GetItem("SoundRUID"))
+	self.hitSoundRUID = _DataSetToTable:GetStringTable(row:GetItem("HitSoundRUID"))
 }
 
 [Client]
 void PreSkill()
 {
-	if self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
+	if self.remainCoolTime > 0 or self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
 	self.state:ChangeState("SKILL")
-	self.timerId1 = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay)
+	self.timerId = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay)
+	self:CalcCoolTime()
 }
 
 [Client]
@@ -41,19 +66,19 @@ void UseSkillClient()
 	local e1 = ActionStateChangedEvent("stabO1", "stabO1", 1.75, SpriteAnimClipPlayType.Onetime)
 	local e2 = ActionStateChangedEvent("swingTF", "swingTF", 1.25, SpriteAnimClipPlayType.Onetime)
 	local e3 = ActionStateChangedEvent("swingT1", "swingT1", 1.25, SpriteAnimClipPlayType.Onetime)
-	self.timerId1 = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay)
+	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay)
 	_ActionChange:SendToServer(_UserService.LocalPlayer, e1)
-	_SoundService:PlaySound("915da5a755944599979b9369d1bfd980", 0.75)
+	_SoundService:PlaySound(self.soundRUID[1], 0.75)
 	self.timerId2 = _TimerService:SetTimerOnce(function()
 			self:UseSkillServer2(_UserService.LocalPlayer)
 			self.rigidbody:AddForce(Vector2(15, 0) * self.controller.LookDirectionX)
 			_ActionChange:SendToServer(_UserService.LocalPlayer, e2)
-			_SoundService:PlaySound("8556bff9c68748a08f706799c5d789e6", 0.75)
+			_SoundService:PlaySound(self.soundRUID[2], 0.75)
 		end, 0.55)
 	self.timerId3 = _TimerService:SetTimerOnce(function()
 			self:UseSkillServer3(_UserService.LocalPlayer)
 			_ActionChange:SendToServer(_UserService.LocalPlayer, e3)
-			_SoundService:PlaySound("b66546edf7ff474fb6063a03d23617fa", 0.75)
+			_SoundService:PlaySound(self.soundRUID[3], 0.75)
 		end, 1.2)
 }
 
@@ -61,25 +86,25 @@ void UseSkillClient()
 void UseSkillServer1(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
-	_EffectService:PlayEffectAttached("fb75823f35b44065ad07300a8a21cc03", player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
-	player.AttackComponent:Attack(self.attackSize1, self.attackOffset1 * player.PlayerControllerComponent.LookDirectionX, "Skill4-1", CollisionGroups.Monster)
+	_EffectService:PlayEffectAttached(self.effectRUID[1], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
+	player.AttackComponent:Attack(self.attackSize[1], self.attackOffset[1] * player.PlayerControllerComponent.LookDirectionX, "Skill4-1", CollisionGroups.Monster)
 }
 
 [Server]
 void UseSkillServer2(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
-	_EffectService:PlayEffectAttached("137539a9348b43fa859b85166e24208a", player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
-	player.AttackComponent:Attack(self.attackSize2, self.attackOffset2 * player.PlayerControllerComponent.LookDirectionX, "Skill4-2", CollisionGroups.Monster)
+	_EffectService:PlayEffectAttached(self.effectRUID[2], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
+	player.AttackComponent:Attack(self.attackSize[2], self.attackOffset[2] * player.PlayerControllerComponent.LookDirectionX, "Skill4-2", CollisionGroups.Monster)
 }
 
 [Server]
 void UseSkillServer3(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
-	_EffectService:PlayEffectAttached("5b1bca4c94e64bcab98427cb23106606", player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
+	_EffectService:PlayEffectAttached(self.effectRUID[3], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip})
 	_TimerService:SetTimerOnce(function()
-			player.AttackComponent:Attack(self.attackSize3, self.attackOffset3 * player.PlayerControllerComponent.LookDirectionX, "Skill4-3", CollisionGroups.Monster)
+			player.AttackComponent:Attack(self.attackSize[3], self.attackOffset[3] * player.PlayerControllerComponent.LookDirectionX, "Skill4-3", CollisionGroups.Monster)
 		end, 0.15)
 }
 
@@ -89,6 +114,19 @@ void ChangeStateToIDLE()
 	if self.state.CurrentStateName == "SKILL" then
 		self.state:ChangeState("IDLE")
 	end
+}
+
+[Client]
+void CalcCoolTime()
+{
+	self.remainCoolTime = self.skillCoolTime
+	local coolTimer = 0
+	local CheckCoolTime = function()
+		self.remainCoolTime = self.remainCoolTime - 1
+		log(self.remainCoolTime)
+		if self.remainCoolTime <= 0 then _TimerService:ClearTimer(coolTimer) end
+		end
+	coolTimer = _TimerService:SetTimerRepeat(CheckCoolTime, 1, 1)
 }
 
 
@@ -112,7 +150,7 @@ HandleHitEvent(HitEvent event)
 	local TotalDamage = event.TotalDamage
 	---------------------------------------------------------
 	if self:IsServer() then return end
-	_TimerService:ClearTimer(self.timerId1)
+	_TimerService:ClearTimer(self.timerId)
 	_TimerService:ClearTimer(self.timerId2)
 	_TimerService:ClearTimer(self.timerId3)
 }

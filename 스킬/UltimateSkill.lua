@@ -1,19 +1,40 @@
 --Properties--
 
+string skillName = "UltimateSkill"
 Component state
+number coefficient = 0
 number startDelay = 0
-number totalDelay = 1.5
-Vector2 attackSize = Vector2(14,8)
+number totalDelay = 0
+Vector2 attackSize = Vector2(0,0)
 Vector2 attackOffset = Vector2(0,0)
 integer timerId = 0
+table effectRUID
+string hitEffectRUID = ""
+string soundRUID = ""
+string hitSoundRUID = ""
 
 
 --Methods--
 
-[Client Only]
+[Default]
 void OnBeginPlay()
 {
-	self.state = _UserService.LocalPlayer.StateComponent
+	if self:IsClient() then 
+		self.state = _UserService.LocalPlayer.StateComponent
+	end
+	
+	local skillData = _DataService:GetTable("SwordSkillData")
+	local row = skillData:FindRow("Name", self.skillName)
+	
+	self.coefficient = tonumber(row:GetItem("Coefficient"))
+	self.startDelay = tonumber(row:GetItem("StartDelay"))
+	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
+	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))
+	self.attackOffset = Vector2(tonumber(row:GetItem("AttackOffset.x")), tonumber(row:GetItem("AttackOffset.y")))
+	self.effectRUID = _DataSetToTable:GetStringTable(row:GetItem("EffectRUID"))
+	self.hitEffectRUID = row:GetItem("HitEffectRUID")
+	self.soundRUID = row:GetItem("SoundRUID")
+	self.hitSoundRUID = row:GetItem("HitEffectRUID")
 }
 
 [Client]
