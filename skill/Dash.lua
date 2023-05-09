@@ -1,9 +1,10 @@
 --Properties--
 
 string skillName = "SwordDash"
-Component state
-Component rigidbody
-Component controller
+Component playerComponent
+Component stateComponent
+Component rigidbodyComponent
+Component controllerComponent
 number dashForce = 0
 number jumpForce = 0
 number startDelay = 0
@@ -20,9 +21,10 @@ boolean jumpFlag = true
 void OnBeginPlay()
 {
 	if self:IsClient() then
-		self.state = _UserService.LocalPlayer.StateComponent
-		self.rigidbody = _UserService.LocalPlayer.RigidbodyComponent
-		self.controller = _UserService.LocalPlayer.PlayerControllerComponent
+		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
+		self.stateComponent = _UserService.LocalPlayer.StateComponent
+		self.rigidbodyComponent = _UserService.LocalPlayer.RigidbodyComponent
+		self.controllerComponent = _UserService.LocalPlayer.PlayerControllerComponent
 	end
 	
 	local skillData = _DataService:GetTable("DashData")
@@ -41,8 +43,8 @@ void OnBeginPlay()
 [Client]
 void PreSkill()
 {
-	if self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" 
-		and self.state.CurrentStateName ~= "FALL" and self.state.CurrentStateName ~= "JUMP" or self.jumpFlag == false then return end
+	if self.stateComponent.CurrentStateName ~= "IDLE" and self.stateComponent.CurrentStateName ~= "MOVE" and self.stateComponent.CurrentStateName ~= "ATTACK_WAIT" 
+		and self.stateComponent.CurrentStateName ~= "FALL" and self.stateComponent.CurrentStateName ~= "JUMP" or self.jumpFlag == false then return end
 	self.timerId = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay)
 	
 }
@@ -51,16 +53,16 @@ void PreSkill()
 void UseSkillClient()
 {
 	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay)
-	if self.state.CurrentStateName == "JUMP" or self.state.CurrentStateName == "FALL" then
-		self.state:ChangeState("SKILL")
+	if self.stateComponent.CurrentStateName == "JUMP" or self.stateComponent.CurrentStateName == "FALL" then
+		self.stateComponent:ChangeState("SKILL")
 		self.jumpFlag = false
 		self:UseSkillServer1(_UserService.LocalPlayer)
-		self.rigidbody:SetForce(Vector2(self.rigidbody.RealMoveVelocity.x * 50, self.jumpForce))
+		self.rigidbodyComponent:SetForce(Vector2(self.rigidbodyComponent.RealMoveVelocity.x * 50, self.jumpForce))
 		_SoundService:PlaySound(self.soundRUID, 0.75)
 	else
-		self.state:ChangeState("SKILL")
+		self.stateComponent:ChangeState("SKILL")
 		self:UseSkillServer2(_UserService.LocalPlayer)
-		self.rigidbody:SetForce(Vector2(self.dashForce , 0) * self.controller.LookDirectionX)
+		self.rigidbodyComponent:SetForce(Vector2(self.dashForce , 0) * self.controllerComponent.LookDirectionX)
 		_SoundService:PlaySound(self.soundRUID, 0.75)
 	end
 }
@@ -82,8 +84,8 @@ void UseSkillServer2(Entity player)
 [Client Only]
 void ChangeStateToIDLE()
 {
-	if self.state.CurrentStateName == "SKILL" then
-		self.state:ChangeState("IDLE")
+	if self.stateComponent.CurrentStateName == "SKILL" then
+		self.stateComponent:ChangeState("IDLE")
 	end
 }
 

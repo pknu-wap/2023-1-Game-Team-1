@@ -1,13 +1,17 @@
 --Properties--
 
 string skillName = "UltimateSkill"
-Component state
+Component playerComponent
+Component stateComponent
 number coefficient = 0
 number startDelay = 0
 number totalDelay = 0
 Vector2 attackSize = Vector2(0,0)
 Vector2 attackOffset = Vector2(0,0)
 integer timerId = 0
+number remainCoolTime = 0
+number skillCoolTime = 0
+integer mpConsumption = 0
 table effectRUID
 string hitEffectRUID = ""
 string soundRUID = ""
@@ -19,8 +23,9 @@ string hitSoundRUID = ""
 [Default]
 void OnBeginPlay()
 {
-	if self:IsClient() then 
-		self.state = _UserService.LocalPlayer.StateComponent
+	if self:IsClient() then
+		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent 
+		self.stateComponent = _UserService.LocalPlayer.StateComponent
 	end
 	
 	local skillData = _DataService:GetTable("SwordSkillData")
@@ -31,6 +36,8 @@ void OnBeginPlay()
 	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
 	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))
 	self.attackOffset = Vector2(tonumber(row:GetItem("AttackOffset.x")), tonumber(row:GetItem("AttackOffset.y")))
+	self.skillCoolTime = tonumber(row:GetItem("CoolTime"))
+	self.mpConsumption = tonumber(row:GetItem("MpConsumption"))
 	self.effectRUID = _DataSetToTable:GetStringTable(row:GetItem("EffectRUID"))
 	self.hitEffectRUID = row:GetItem("HitEffectRUID")
 	self.soundRUID = row:GetItem("SoundRUID")
@@ -40,8 +47,10 @@ void OnBeginPlay()
 [Client]
 void PreSkill()
 {
-	if self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
-	self.state:ChangeState("SKILL")
+	if self.stateComponent.CurrentStateName ~= "IDLE" and self.stateComponent.CurrentStateName ~= "MOVE" and self.stateComponent.CurrentStateName ~= "ATTACK_WAIT" or self.remainCoolTime > 0 or self.playerComponent.Mp < self.mpConsumption then return end
+	self.playerComponent:MpConsume(self.mpConsumption)
+	self:CalcCoolTime()
+	self.stateComponent:ChangeState("SKILL")
 	self.timerId = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay)
 }
 
@@ -72,9 +81,22 @@ void UseSkillServer(Entity player)
 [Client Only]
 void ChangeStateToIDLE()
 {
-	if self.state.CurrentStateName == "SKILL" then
-		self.state:ChangeState("IDLE")
+	if self.stateComponent.CurrentStateName == "SKILL" then
+		self.stateComponent:ChangeState("IDLE")
 	end
+}
+
+[Client]
+void CalcCoolTime()
+{
+	self.remainCoolTime = self.skillCoolTime
+	local coolTimer = 0
+	local CheckCoolTime = function()
+		self.remainCoolTime = self.remainCoolTime - 1
+		log(self.remainCoolTime)
+		if self.remainCoolTime <= 0 then _TimerService:ClearTimer(coolTimer) end
+		end
+	coolTimer = _TimerService:SetTimerRepeat(CheckCoolTime, 1, 1)
 }
 
 

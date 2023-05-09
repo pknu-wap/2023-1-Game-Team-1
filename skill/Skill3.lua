@@ -1,10 +1,11 @@
 --Properties--
 
 string skillName = "Skill3"
-Component state
-Component rigidbody
-Component controller
-Component hit
+Component playerComponent
+Component stateComponent
+Component rigidbodyComponent
+Component controllerComponent
+Component hitComponent
 number coefficient = 0
 number startDelay = 0
 number totalDelay = 0
@@ -13,6 +14,7 @@ Vector2 attackOffset = Vector2(0,0)
 integer timerId = 0
 number remainCoolTime = 0
 number skillCoolTime = 0
+integer mpConsumption = 0
 table effectRUID
 string hitEffectRUID = ""
 table soundRUID
@@ -25,21 +27,23 @@ string hitSoundRUID = ""
 void OnBeginPlay()
 {
 	if self:IsClient() then 
-		self.state = _UserService.LocalPlayer.StateComponent
-		self.rigidbody = _UserService.LocalPlayer.RigidbodyComponent
-		self.controller = _UserService.LocalPlayer.PlayerControllerComponent
-		self.hit = _UserService.LocalPlayer.PlayerHit
+		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
+		self.stateComponent = _UserService.LocalPlayer.StateComponent
+		self.rigidbodyComponent = _UserService.LocalPlayer.RigidbodyComponent
+		self.controllerComponent = _UserService.LocalPlayer.PlayerControllerComponent
+		self.hitComponent = _UserService.LocalPlayer.PlayerHit
 	end
 	
 	local skillData = _DataService:GetTable("SwordSkillData")
 	local row = skillData:FindRow("Name", self.skillName)
 	local row2 = skillData:FindRow("Name", "Skill3 - Counter")
 	self.coefficient = tonumber("Coefficient")
+	self.startDelay = tonumber(row:GetItem("StartDelay"))
+	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
 	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))
 	self.attackOffset = Vector2(tonumber(row:GetItem("AttackOffset.x")), tonumber(row:GetItem("AttackOffset.y")))
 	self.skillCoolTime = tonumber(row:GetItem("CoolTime"))
-	self.startDelay = tonumber(row:GetItem("StartDelay"))
-	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
+	self.mpConsumption = tonumber(row:GetItem("MpConsumption"))
 	self.effectRUID = _DataSetToTable:GetStringTable(row:GetItem("EffectRUID"))
 	self.hitEffectRUID = row:GetItem("HitEffectRUID")
 	self.soundRUID = _DataSetToTable:GetStringTable(row:GetItem("SoundRUID"))
@@ -49,9 +53,10 @@ void OnBeginPlay()
 [Client]
 void PreSkill()
 {
-	if self.remainCoolTime > 0 or self.state.CurrentStateName ~= "IDLE" and self.state.CurrentStateName ~= "MOVE" and self.state.CurrentStateName ~= "ATTACK_WAIT" then return end
-	self.state:ChangeState("SKILL")
-	self.hit:Counter(0.25)
+	if self.stateComponent.CurrentStateName ~= "IDLE" and self.stateComponent.CurrentStateName ~= "MOVE" and self.stateComponent.CurrentStateName ~= "ATTACK_WAIT" or self.remainCoolTime > 0 or self.playerComponent.Mp < self.mpConsumption then return end
+	self.stateComponent:ChangeState("SKILL")
+	self.hitComponent:Counter(0.25)
+	self.playerComponent:MpConsume(self.mpConsumption)
 	self:CalcCoolTime()
 	local e = ActionStateChangedEvent("swingT3", "swingT3", 0.1, SpriteAnimClipPlayType.Onetime)
 	self.timerId = _TimerService:SetTimerOnce(function() self:UseSkillClient(false) end, self.startDelay)
@@ -62,9 +67,9 @@ void PreSkill()
 void UseSkillClient(boolean isSuccess)
 {
 	local e = ActionStateChangedEvent("swingTF", "swingTF", 1.0, SpriteAnimClipPlayType.Onetime)
-	self.state:ChangeState("SKILL")
+	self.stateComponent:ChangeState("SKILL")
 	_TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay)
-	self.rigidbody:AddForce(Vector2(20, 0) * self.controller.LookDirectionX)
+	self.rigidbodyComponent:AddForce(Vector2(20, 0) * self.controllerComponent.LookDirectionX)
 	_SoundService:PlaySound(self.soundRUID[1], 0.75)
 	if isSuccess then 
 		_ActionChange:SendToServer(_UserService.LocalPlayer, e)
@@ -87,8 +92,8 @@ void UseSkillServer(Entity player)
 [Client Only]
 void ChangeStateToIDLE()
 {
-	if self.state.CurrentStateName == "SKILL" then
-		self.state:ChangeState("IDLE")
+	if self.stateComponent.CurrentStateName == "SKILL" then
+		self.stateComponent:ChangeState("IDLE")
 	end
 }
 
