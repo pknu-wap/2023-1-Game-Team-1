@@ -71,7 +71,7 @@ void SpawnSpirit()
 	for i = 0, count do
 		local randomX = math.random(-10, 10)
 		local transformComponent = self.Entity.TransformComponent
-		_SpawnService:SpawnByModelId("model://e99a1e62-e9a4-41ad-baa6-55a531df04e1", "spirit", Vector3(transformComponent.Position.x + randomX, transformComponent.Position.y + 0.5, transformComponent.Position.z), self.Entity.Parent)
+		_SpawnService:SpawnByModelId("model://e99a1e62-e9a4-41ad-baa6-55a531df04e1", "spirit", Vector3(transformComponent.Position.x + randomX, transformComponent.Position.y , transformComponent.Position.z), self.Entity.Parent)
 	end
 }
 
@@ -128,6 +128,7 @@ HandleStump_Pattern_Event(Stump_Pattern_Event event)
 		
 		self:AttackStateTimer(3)
 	else
+		PtNo = 4
 		if PtNo >= 0 and PtNo <= 2 then
 			--self:teleport()
 			self.attackName = "teleport"
