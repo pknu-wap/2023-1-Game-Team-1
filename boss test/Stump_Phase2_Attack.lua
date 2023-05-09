@@ -78,15 +78,6 @@ void SpawnExplosionStone()
 	_SpawnService:SpawnByModelId("model://81f059a4-e74d-4d59-bca3-dc9a41faf888", "BoomStone", Vector3(transform.Position.x, -0.8, transform.Position.z), self.Entity.Parent)
 }
 
-[Default]
-void SpawnPhase2()
-{
-	local transformComponent = self.Entity.TransformComponent
-	
-	_SpawnService:SpawnByModelId("model://be5ee7cd-c8c2-445a-8395-750f637ab08b", "Boss_Stump_Phase2", Vector3(transformComponent.Position.x, transformComponent.Position.y, transformComponent.Position.z), self.Entity.Parent)
-	self.Entity:Destroy()
-}
-
 
 --Events--
 

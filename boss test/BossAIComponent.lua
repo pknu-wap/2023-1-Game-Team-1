@@ -19,10 +19,6 @@ void OnBeginPlay()
 	--self:GetPlayer()
 	
 	self.BossComponent = self.Entity.Boss
-	if isvalid(_EntityService:GetEntityByTag("Stump")) then
-		self.BossComponent = self.Entity.Boss
-		self.detectDistance = 1
-	end
 	
 	if isvalid(self.BossComponent) then
 			log("보스 컴포넌트 확인")
