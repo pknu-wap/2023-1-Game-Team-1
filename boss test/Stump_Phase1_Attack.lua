@@ -90,7 +90,7 @@ void teleport()
 [Default]
 void SpawnSpirit()
 {
-	local count = math.random(5, 10)
+	local count = math.random(2, 4)
 	for i = 0, count do
 		local randomX = math.random(-10, 10)
 		local transformComponent = self.Entity.TransformComponent
