@@ -32,7 +32,7 @@ void OnBeginPlay()
 	
 	local Succeeder = Checker()
 	--Succeeder.player = self.player
-	Succeeder.BossAiComponent = self.Entity.BossAIComponent
+	Succeeder.BossAIComponent = self.Entity.BossAIComponent
 	
 	local CA = CanAttack()
 	--CA.player = self.player

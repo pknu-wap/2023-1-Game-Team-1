@@ -15,6 +15,10 @@ void OnInit()
 [Default]
 any OnBehave(number delta)
 {
+	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName == "DEAD" then
+		log("보스 죽음")
+		return BehaviourTreeStatus.Failure
+	end
 	if self.BossAIComponent.BossComponent.attackEnd == false then
 		return BehaviourTreeStatus.Running
 	else

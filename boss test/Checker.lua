@@ -2,7 +2,7 @@
 
 any Child = nil
 Entity player
-Component BossAiComponent
+Component BossAIComponent
 
 
 --Methods--
@@ -10,6 +10,10 @@ Component BossAiComponent
 [Default]
 any OnBehave(number delta)
 {
+	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName == "DEAD" then
+		log("보스 죽음")
+		return BehaviourTreeStatus.Failure
+	end
 	local BossComponent = self.ParentAI.Entity.Boss
 	
 	if BossComponent.Hp <= 0 then

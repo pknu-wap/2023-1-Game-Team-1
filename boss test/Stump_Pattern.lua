@@ -17,6 +17,10 @@ void OnInit()
 any OnBehave(number delta)
 {
 	--log("PtNo : 성공 ")-- ..self.PtNo)
+	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName == "DEAD" then
+		log("보스 죽음")
+		return BehaviourTreeStatus.Failure
+	end
 	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName ~= "CHASE" then
 		log("움직이지 않습니다 ")
 		return BehaviourTreeStatus.Failure

@@ -35,6 +35,10 @@ any OnBehave(number delta)
 		self.BossAIComponent.BossComponent.stateComponent:ChangeState("IDLE")
 		return BehaviourTreeStatus.Failure
 	end
+	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName == "DEAD" then
+		log("보스 죽음")
+		return BehaviourTreeStatus.Failure
+	end
 	
 	local dir = self.targetTransform.Position - self.BossTransform.Position
 	dir.z = 0
