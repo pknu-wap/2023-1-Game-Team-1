@@ -108,10 +108,10 @@ void OpenInventoryPopup()
 	_PopupHandler:OpenPage("inventory")
 }
 
-[Default]
+[Client Only]
 void Tmp()
 {
-	_EnforceClient:LoadWeaponPage()
+	_EnforceClient:LoadEquips()
 }
 
 

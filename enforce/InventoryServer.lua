@@ -20,6 +20,7 @@ string emptyInvenJson = nil
 string emptyItemStatusJson = nil
 string emptyEquipStatusJson = nil
 string globalKey = "Global"
+table equipElements
 
 
 --Methods--
@@ -137,11 +138,12 @@ void AddItem(string userId, string category, string itemCode)
 		invenJson = _HttpService:JSONEncode(inven)
 		db:SetAndWait(invenKey, invenJson)
 		
-		equipStatus[id] = {}
+		--equipStatus[id] = {}
 		--equipStatus[id].code = itemCode
 		--woo:장비 랜덤 생성
-		equipStatus[id].code = tostring(math.random(1, 5))
-		--woo:여기 장비 수치들 추가
+		local rand = math.random(1, 5)
+		--woo:장비 생성 함수로
+		equipStatus[id] = self:GetNewEquip(rand, id) 
 		equipStatusJson = _HttpService:JSONEncode(equipStatus)
 		db:SetAndWait(self.equipStatusKey, equipStatusJson)
 		
@@ -351,6 +353,20 @@ void SubSoul(string userId, integer inputSoul)
 	db:SetAndWait(self.soulKey, tostring(math.floor(currentSoul)))
 	
 	self:UpdateUserData(userId)
+}
+
+[Server]
+table GetNewEquip(integer code, string id)
+{
+	local equipDataSet = _DataService:GetTable("EquipDataSet"):GetRow(code)
+	--log(equipDataSet)
+	local equip = {}
+	for _, element in pairs(self.equipElements) do
+		equip["id"] = id
+		equip[element] = equipDataSet:GetItem(element)
+	end
+	
+	return equip
 }
 
 

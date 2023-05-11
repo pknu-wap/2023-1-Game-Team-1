@@ -2,7 +2,7 @@
 
 Entity selected
 number idx = nil
-number itemId = 0
+string itemId = ""
 string group = ""
 
 
