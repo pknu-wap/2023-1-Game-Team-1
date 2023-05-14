@@ -76,22 +76,6 @@ void TapOpen(string location, string tap)
 	end
 }
 
-[Client]
-void CenterTapOpen(string tap)
-{
-	self.centerTapState = self.centerTapStateTable[tap]
-	for i = 1, self.centerTapCount do
-		local color = Color.gray
-		local bool = false
-		if i == self.centerTapState then
-			color = Color.black
-			bool = true
-		end
-		self.centerTapPageTable[i]:SetVisible(bool)
-		self.centerTapButtonTable[i].TextComponent.FontColor = color
-	end
-}
-
 
 --Events--
 

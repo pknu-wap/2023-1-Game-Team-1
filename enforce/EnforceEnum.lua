@@ -12,6 +12,9 @@ string CenterTapEnforceButtonId = "0ca1527a-8d6c-4f56-801d-7f164d8ec578"
 string CenterTapScrollButtonId = "d97e8c87-4c8b-4aca-a06b-c0521c529bcb"
 string CenterTapEnchantButtonId = "d55eb622-0b18-4e90-a8d6-0d82ae929a9a"
 string CenterTapSuccessionButtonId = "eef47952-ed15-49da-95e0-16d11b03b86d"
+string EquipDataSet = "EquipDataSet"
+string EnforceDataSet = "EnforceDataSet"
+string EquipStatusKey = "EquipStatus"
 
 
 --Methods--

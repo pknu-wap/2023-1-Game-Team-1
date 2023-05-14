@@ -8,7 +8,6 @@ table data
 table img
 string equipDataSet = "EquipDataSet"
 string consumeDataSet = "ConsumeDataSet"
-string emptyImg = "3e9d52ed52d64794bbd6f72bab8ee3d9"
 string currentCategory = nil
 string equipCategory = nil
 string consumeCategory = nil
@@ -82,7 +81,7 @@ void UpdateUI(string category)
 {
 	-- UI 갱신
 	
-	log("update ui")
+	log("inventory update ui")
 	self.currentCategory = category
 	local inven = self.data[category]
 	
@@ -91,7 +90,7 @@ void UpdateUI(string category)
 		local txt = nil
 		
 		if inven[i] == "0" then
-			img = self.emptyImg
+			img = _Util.EmptyImg
 			txt = ""
 			
 		elseif category == self.equipCategory then

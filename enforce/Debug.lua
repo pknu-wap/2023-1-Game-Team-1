@@ -16,6 +16,7 @@ Entity inventoryPopupButton
 Entity tmpButton
 string userId = ""
 number soulValue = 100
+number NewValue1 = 0
 
 
 --Methods--
@@ -40,7 +41,6 @@ void OnBeginPlay()
 	self.inventoryPopupButton:ConnectEvent(ButtonClickEvent, function() self:OpenInventoryPopup() end)
 	self.tmpButton:ConnectEvent(ButtonClickEvent, function() self:Tmp() end)
 	
-	--woo : 이거 미리 선언해둔걸로 바꿨어용
 	self.userId = _UserService.LocalPlayer.Name 
 }
 
@@ -49,6 +49,7 @@ void AddItem(string category, string itemCode)
 {
 	--local id = _UserService.LocalPlayer.Name
 	_InventoryServer:AddItem(self.userId, category, itemCode)
+	_EnforceClient:UpdateUI()
 }
 
 [Default]
@@ -111,7 +112,7 @@ void OpenInventoryPopup()
 [Client Only]
 void Tmp()
 {
-	_EnforceClient:LoadEquips()
+	_EnforceClient:UpdateUI()
 }
 
 

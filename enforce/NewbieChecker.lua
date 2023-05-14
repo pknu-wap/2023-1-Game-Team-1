@@ -29,7 +29,6 @@ HandleUserEnterEvent(UserEnterEvent event)
 	local _, visited = db:GetAndWait(self.visitedKey)
 	
 	--if not visited then
-		log("Newbie entered")
 		self:ResetInventory(UserId)
 		db:SetAndWait(self.visitedKey, "true")
 	--end

@@ -84,7 +84,9 @@ string GetEmptyEquipStatusJson()
 	-- 빈 equipStatus json을 생성한다.
 	
 	local status = {}
-	status["0"] = "0"
+	--임시 첫 값 생성
+	status["0"] = self:GetNewEquip(1, "0")
+	--status["0"] = "0"
 	local json = _HttpService:JSONEncode(status)
 	return json
 }
@@ -94,7 +96,6 @@ void ResetInventory(string userId)
 {
 	-- 인벤토리를 초기화한다.
 	
-	log("Reset Inven")
 	local db = _DataStorageService:GetUserDataStorage(userId)
 	local emptyInvenJson = self.emptyInvenJson
 	local emptyEquipStatusJson = self.emptyEquipStatusJson
@@ -120,8 +121,6 @@ void ResetInventory(string userId)
 void AddItem(string userId, string category, string itemCode)
 {
 	-- 인벤토리에 아이템을 추가한다.
-	
-	log("add item")
 	local db = _DataStorageService:GetUserDataStorage(userId)
 	local invenKey = self.categoryToKey[category]
 	local _, invenJson = db:GetAndWait(invenKey)
@@ -141,9 +140,9 @@ void AddItem(string userId, string category, string itemCode)
 		--equipStatus[id] = {}
 		--equipStatus[id].code = itemCode
 		--woo:장비 랜덤 생성
-		local rand = math.random(1, 5)
+		local rand = math.random(1, 6)
 		--woo:장비 생성 함수로
-		equipStatus[id] = self:GetNewEquip(rand, id) 
+		equipStatus[id] = self:GetNewEquip(rand, id)
 		equipStatusJson = _HttpService:JSONEncode(equipStatus)
 		db:SetAndWait(self.equipStatusKey, equipStatusJson)
 		
@@ -358,14 +357,34 @@ void SubSoul(string userId, integer inputSoul)
 [Server]
 table GetNewEquip(integer code, string id)
 {
-	local equipDataSet = _DataService:GetTable("EquipDataSet"):GetRow(code)
-	--log(equipDataSet)
+	local equipData = _DataService:GetTable("EquipDataSet"):GetRow(code)
+	local enforceData = _DataService:GetTable(_EnforceEnum.EnforceDataSet)
+	
 	local equip = {}
 	for _, element in pairs(self.equipElements) do
 		equip["id"] = id
-		equip[element] = equipDataSet:GetItem(element)
+		equip[element] = equipData:GetItem(element)
 	end
 	
+	equip["baseAtkPoint"] = equipData:GetItem("baseAtkPoint")
+	equip["enforce"] = "0"
+	equip["enforcePlusAtk"] = "0"
+	equip["enforcePlusPercent"] = "0"
+	
+	return equip
+}
+
+[Server]
+table EquipDataCalculate(table equip)
+{
+	--타입에 따라 나누기
+	if equip["type"] == "1" then
+		local enforceData = _DataService:GetTable(_EnforceEnum.EnforceDataSet)
+		local equipData = _DataService:GetTable(_EnforceEnum.EquipDataSet)
+		
+		
+		equip["enforce"] = "0"
+	end
 	return equip
 }
 
