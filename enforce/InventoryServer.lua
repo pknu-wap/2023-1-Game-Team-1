@@ -6,6 +6,7 @@ string consumeKey = "Consume"
 string materialKey = "Material"
 string costumeKey = "Costume"
 string soulKey = "Soul"
+string resourceStatusKey = "Resource"
 string equipStatusKey = "EquipStatus"
 string itemStatusKey = "ItemStatus"
 string uniqueIdKey = "UniqueId"
@@ -16,9 +17,11 @@ string materialCategory = nil
 string costumeCategory = nil
 string equipStatus = nil
 string itemStatus = nil
+string resourceStatus = nil
 string emptyInvenJson = nil
 string emptyItemStatusJson = nil
 string emptyEquipStatusJson = nil
+string emptyResourceJson = nil
 string globalKey = "Global"
 table equipElements
 
@@ -37,15 +40,18 @@ void OnBeginPlay()
 	self.costumeCategory = _InventoryEnum.costumeCategory
 	self.equipStatus = _InventoryEnum.equipStatus
 	self.itemStatus = _InventoryEnum.itemStatus
+	self.resourceStatus = _InventoryEnum.resourceStatus
 	
 	self.categoryToKey[self.equipCategory] = self.equipKey
 	self.categoryToKey[self.consumeCategory] = self.consumeKey
 	self.categoryToKey[self.materialCategory] = self.materialKey
 	self.categoryToKey[self.costumeCategory] = self.costumeKey
+	self.categoryToKey[self.resourceStatusKey] =self.resourceStatusKey 
 	
 	self.emptyInvenJson = self:GetEmptyInventoryJson()
 	self.emptyEquipStatusJson = self:GetEmptyEquipStatusJson()
 	self.emptyItemStatusJson = self:GetEmptyItemStatusJson()
+	self.emptyResourceJson = self:GetEmptyResourceJson()
 }
 
 [Server]
@@ -92,6 +98,17 @@ string GetEmptyEquipStatusJson()
 }
 
 [Server]
+string GetEmptyResourceJson()
+{
+	local resource = {}
+	for i = 1, 6 do
+		resource[i] = "0"
+	end
+	local json = _HttpService:JSONEncode(resource)
+	return json
+}
+
+[Server]
 void ResetInventory(string userId)
 {
 	-- 인벤토리를 초기화한다.
@@ -100,16 +117,15 @@ void ResetInventory(string userId)
 	local emptyInvenJson = self.emptyInvenJson
 	local emptyEquipStatusJson = self.emptyEquipStatusJson
 	local emptyItemStatusJson = self.emptyItemStatusJson
+	local emptyResourceJson = self.emptyResourceJson
 	
-	--woo:소울 추가
 	local zero = "0"
 	
 	db:SetAndWait(self.equipKey, emptyInvenJson)
 	db:SetAndWait(self.consumeKey, emptyInvenJson)
 	db:SetAndWait(self.materialKey, emptyInvenJson)
 	db:SetAndWait(self.costumeKey, emptyInvenJson)
-	--woo:소울 추가
-	db:SetAndWait(self.soulKey, zero)
+	db:SetAndWait(self.resourceStatusKey, emptyResourceJson)
 	
 	db:SetAndWait(self.equipStatusKey, emptyEquipStatusJson)
 	db:SetAndWait(self.itemStatusKey, emptyItemStatusJson)
@@ -139,7 +155,7 @@ void AddItem(string userId, string category, string itemCode)
 		
 		--equipStatus[id] = {}
 		--equipStatus[id].code = itemCode
-		--woo:장비 랜덤 생성
+	
 		local rand = math.random(1, 6)
 		--woo:장비 생성 함수로
 		equipStatus[id] = self:GetNewEquip(rand, id)
@@ -275,8 +291,8 @@ void UpdateUserData(string userId)
 	local _, costumeJson = db:GetAndWait(self.costumeKey)
 	local _, equipStatusJson = db:GetAndWait(self.equipStatusKey)
 	local _, itemStatusJson = db:GetAndWait(self.itemStatusKey)
-	--woo:소울도 같이 업데이트
-	local _, soulString = db:GetAndWait(self.soulKey)
+	--자원 업데이트
+	local _, resourceStatusJson = db:GetAndWait(self.resourceStatusKey)
 	
 	local equip = _HttpService:JSONDecode(equipJson)
 	local consume = _HttpService:JSONDecode(consumeJson)
@@ -284,6 +300,7 @@ void UpdateUserData(string userId)
 	local costume = _HttpService:JSONDecode(costumeJson)
 	local equipStatus = _HttpService:JSONDecode(equipStatusJson)
 	local itemStatus = _HttpService:JSONDecode(itemStatusJson)
+	local resourceStatus = _HttpService:JSONDecode(resourceStatusJson)
 	
 	local data = {}
 	data[self.equipCategory] = equip
@@ -292,7 +309,7 @@ void UpdateUserData(string userId)
 	data[self.costumeCategory] = costume
 	data[self.equipStatus] = equipStatus
 	data[self.itemStatus] = itemStatus
-	data[self.soulKey] = soulString
+	data[self.resourceStatusKey] = resourceStatus
 	
 	local json = _HttpService:JSONEncode(data)
 	_InventoryClient:UpdateData(json, userId)
@@ -307,49 +324,49 @@ void UpdateData(string userId, string category, string invenJson)
 }
 
 [Server]
-integer GetSoul(string userId)
+integer GetResource(string userId, number resourceNum)
 {
 	--woo:소울값 리턴 함수
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, currentSoul = db:GetAndWait(self.soulKey)
+	local _, resourceJson = db:GetAndWait(self.resourceStatusKey)
+	local resource = _HttpService:JSONDecode(resourceJson)
 	
-	return tonumber(currentSoul)
+	return tonumber(resource[resourceNum])
 }
 
 [Server]
-void SetSoul(string userId, integer inputSoul)
+void SetResource(string userId, number resourceNum, number value)
 {
 	--woo:소울값 inputSoul로 설정
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	db:SetAndWait(self.soulKey, tostring(inputSoul))
-	local _, currentSoul = db:GetAndWait(self.soulKey)
+	local _, resourceJson = db:GetAndWait(self.resourceStatusKey)
+	local resource = _HttpService:JSONDecode(resourceJson)
+	
+	resource[resourceNum] = tostring(value)
+	
+	resourceJson = _HttpService:JSONEncode(resource)
+	db:SetAndWait(self.resourceStatusKey, resourceJson)
 	
 	self:UpdateUserData(userId)
 }
 
 [Server]
-void AddSoul(string userId, integer inputSoul)
+void AddResource(string userId, number resourceNum, number value)
 {
-	--woo:소울값 inputSoul만큼 추가
+	--소울값 value만큼 더하기
 	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, currentSoul = db:GetAndWait(self.soulKey)
-	currentSoul = currentSoul + inputSoul
-	db:SetAndWait(self.soulKey, tostring(math.floor(currentSoul)))
+	local _, resourceJson = db:GetAndWait(self.resourceStatusKey)
+	local resource = _HttpService:JSONDecode(resourceJson)
+	local current = math.floor(tonumber(resource[resourceNum]) + value)
 	
-	self:UpdateUserData(userId)
-}
-
-[Server]
-void SubSoul(string userId, integer inputSoul)
-{
-	--woo:소울값 inputSoul만큼 추가
-	--음수일 경우 0
-	local db = _DataStorageService:GetUserDataStorage(userId)
-	local _, currentSoul = db:GetAndWait(self.soulKey)
-	currentSoul = currentSoul - inputSoul
-	if currentSoul < 0 then 
-		currentSoul = 0 end
-	db:SetAndWait(self.soulKey, tostring(math.floor(currentSoul)))
+	if current < 0 then
+		current = 0
+	end
+	
+	resource[resourceNum] = tostring(current)
+	
+	resourceJson = _HttpService:JSONEncode(resource)
+	db:SetAndWait(self.resourceStatusKey, resourceJson)
 	
 	self:UpdateUserData(userId)
 }
@@ -358,7 +375,6 @@ void SubSoul(string userId, integer inputSoul)
 table GetNewEquip(integer code, string id)
 {
 	local equipData = _DataService:GetTable("EquipDataSet"):GetRow(code)
-	local enforceData = _DataService:GetTable(_EnforceEnum.EnforceDataSet)
 	
 	local equip = {}
 	for _, element in pairs(self.equipElements) do
@@ -366,26 +382,42 @@ table GetNewEquip(integer code, string id)
 		equip[element] = equipData:GetItem(element)
 	end
 	
-	equip["baseAtkPoint"] = equipData:GetItem("baseAtkPoint")
 	equip["enforce"] = "0"
-	equip["enforcePlusAtk"] = "0"
-	equip["enforcePlusPercent"] = "0"
+	equip["enforceAddAtk"] = "0"
+	
+	equip["finalAtkPoint"] = equip["baseAtkPoint"]
 	
 	return equip
 }
 
 [Server]
-table EquipDataCalculate(table equip)
+void EquipDataCalculate(string userId, string id)
 {
+	local db = _DataStorageService:GetUserDataStorage(userId)
+	local _, equipStatusJson = db:GetAndWait(self.equipStatusKey)
+	local equipStatus = _HttpService:JSONDecode(equipStatusJson)
+	local equip = equipStatus[id]
+	
 	--타입에 따라 나누기
 	if equip["type"] == "1" then
 		local enforceData = _DataService:GetTable(_EnforceEnum.EnforceDataSet)
 		local equipData = _DataService:GetTable(_EnforceEnum.EquipDataSet)
 		
+		local enforceValue = tonumber(equip["enforce"]) + 1
 		
-		equip["enforce"] = "0"
+		local baseAtk = tonumber(equip["baseAtkPoint"])
+		local fixed = tonumber(enforceData:GetCell(enforceValue, "FixedAdd"))
+		local ratio = tonumber(enforceData:GetCell(enforceValue, "RatioAdd"))
+		local enforceAdd = fixed + math.floor(baseAtk * ratio / 100) 
+		local finalAtk = baseAtk + enforceAdd
+		
+		equip["enforceAddAtk"] = tostring(enforceAdd)
+		equip["finalAtkPoint"] = tostring(finalAtk)
 	end
-	return equip
+	
+	equipStatus[id] = equip
+	equipStatusJson = _HttpService:JSONEncode(equipStatus)
+	db:SetAndWait(self.equipStatusKey, equipStatusJson)
 }
 
 

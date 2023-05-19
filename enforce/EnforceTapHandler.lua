@@ -74,6 +74,11 @@ void TapOpen(string location, string tap)
 		self.tapPageTable[location][i]:SetVisible(bool)
 		self.tapButtonTable[location][i].TextComponent.FontColor = color
 	end
+	
+	if location == "center" then
+		--_EnforceClient:CostSlotUpdate(tap)
+	end
+	
 }
 
 

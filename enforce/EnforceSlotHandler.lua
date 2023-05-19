@@ -1,7 +1,6 @@
 --Properties--
 
 Entity currentSelected
-string userId = nil
 number currentIdx = -1
 string currentItemId = ""
 
@@ -14,7 +13,7 @@ void Select(Entity selected, number idx, string itemId)
 	if itemId ~= "" then
 		if self.currentIdx == idx then
 			self:Deselect()
-			_EnforceClient:LeftTapInfoPageOpen(itemId, idx)
+			_EnforceClient:WeaponSelect(itemId, idx)
 			_EnforceTapHandler:TapOpen("left", "info")
 			
 		else

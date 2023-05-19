@@ -15,9 +15,9 @@ string materialCategory = nil
 string costumeCategory = nil
 string equipStatus = nil
 string itemStatus = nil
+string resourceStatus = nil
 string userId = nil
 number slotCnt = nil
-number soul = 0
 
 
 --Methods--
@@ -34,6 +34,7 @@ void OnBeginPlay()
 	self.costumeCategory = _InventoryEnum.costumeCategory
 	self.equipStatus = _InventoryEnum.equipStatus
 	self.itemStatus = _InventoryEnum.itemStatus
+	self.resourceStatus = _InventoryEnum.resourceStatus
 	
 	self.currentCategory = self.equipCategory
 	self.userId = _UserService.LocalPlayer.Name
@@ -64,8 +65,6 @@ void OnBeginPlay()
 	for i = 2, self.slotCnt do
 		local slot = self.slot:Clone(nil)
 		slot.InventorySlot.idx = i
-		
-		--woo:슬롯 어디 슬롯인지 저장
 		slot.InventorySlot.group = "inventory"
 		self.sprites[i] = slot.Children[1].SpriteGUIRendererComponent
 		self.texts[i] = slot.Children[2].TextComponent
@@ -110,7 +109,10 @@ void UpdateUI(string category)
 	end
 	
 	--woo:소울 클라이언트 업데이트
-	self.soulSlot.Text = self.data["Soul"]
+	--소울 -> 자원 으로 바꾸는 작업
+	local resource = self.data[self.resourceStatus]
+	self.soulSlot.Text = resource[_InventoryEnum.resourceSoul]
+	log(resource)
 }
 
 [Client]

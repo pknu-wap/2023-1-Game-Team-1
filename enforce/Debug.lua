@@ -15,7 +15,7 @@ Entity enforcePopupButton
 Entity inventoryPopupButton
 Entity tmpButton
 string userId = ""
-number soulValue = 100
+number soulValue = 10000
 number NewValue1 = 0
 
 
@@ -76,19 +76,19 @@ void Reset()
 [Client Only]
 void AddSoul()
 {
-	_InventoryServer:AddSoul(self.userId, self.soulValue)
+	_InventoryServer:AddResource(self.userId, _EnforceEnum.ResourceSoul, self.soulValue)
 }
 
 [Client Only]
 void SubSoul()
 {
-	_InventoryServer:SubSoul(self.userId, self.soulValue)
+	_InventoryServer:AddResource(self.userId, _EnforceEnum.ResourceSoul, self.soulValue * -1)
 }
 
 [Client Only]
 void SoulCopy()
 {
-	_InventoryServer:SetSoul(self.userId, 10000)
+	_InventoryServer:SetResource(self.userId, _EnforceEnum.ResourceSoul, 1000000)
 }
 
 [Client Only]

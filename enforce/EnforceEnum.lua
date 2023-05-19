@@ -15,6 +15,16 @@ string CenterTapSuccessionButtonId = "eef47952-ed15-49da-95e0-16d11b03b86d"
 string EquipDataSet = "EquipDataSet"
 string EnforceDataSet = "EnforceDataSet"
 string EquipStatusKey = "EquipStatus"
+number ResourceSoul = 1
+number ResourceEnforceStone = 2
+number ResourceRuneWarrior = 3
+number ResourceRuneThief = 4
+number ResourceRuneBowman = 5
+number ResourceRuneMagician = 6
+string CenterTapEnforce = "enforce"
+string CenterTapScroll = "scroll"
+string CenterTapEnchant = "enchant"
+string CenterTapSuccession = "succession"
 
 
 --Methods--
