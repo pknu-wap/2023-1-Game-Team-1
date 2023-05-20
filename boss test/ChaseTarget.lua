@@ -25,6 +25,7 @@ void OnInit()
 	self.BossAIComponent.BossComponent.InRange = false
 	
 	ChaseTarget().ExclusiveExecutionWhenRunning = true
+	log("CHase시작한다" ..self.BossAIComponent.BossComponent.stateComponent.CurrentStateName)
 }
 
 [Default]

@@ -51,13 +51,24 @@ void OnBeginPlay()
 	
 	local Pt = {}
 	
-	for i = 0,9 do
-		Pt[i] = Stump_Pattern()
-		Pt[i].PtNo = i
-		self.ATK:AttachChild(Pt[i])
-		self.ATK:SetChildNodeProbability(Pt[i], 0.15)
+	if  self.Entity.TagComponent.Tags[2] == "Stump" then
+		log("스텀프 패턴 로드???")
+		for i = 0,9 do
+			Pt[i] = Stump_Pattern()
+			Pt[i].PtNo = i
+			self.ATK:AttachChild(Pt[i])
+			self.ATK:SetChildNodeProbability(Pt[i], 0.15)
+		end
+	elseif self.Entity.TagComponent.Tags[2] == "Golem" then
+		log("골렘 패턴 로드")
+		for i = 0,9 do
+			Pt[i] = Golem_Pattern()
+			Pt[i].PtNo = i
+			self.ATK:AttachChild(Pt[i])
+			self.ATK:SetChildNodeProbability(Pt[i], 0.15)
+		end
 	end
-	
+		
 	local Attacking = Attacking()
 	Attacking.BossAIComponent = self.Entity.BossAIComponent
 	
@@ -110,7 +121,7 @@ void SetPlayer()
 			--log("어디서 오류 ? 3")
 			self.target = p
 		else
-			if isvalid(p) then
+			if isvalid(p) and self.target.StateComponent.CurrentStateName ~= "DEAD" then
 				--log("어디서 오류 ? 4")
 				if p == self.target then
 					log("같은 타겟입니다! 스킵합니다." ..p.Name .." , " ..self.target.Name)
@@ -119,12 +130,11 @@ void SetPlayer()
 				
 				local distTemp = Vector2.Distance(p.TransformComponent.Position:ToVector2(), self.Entity.TransformComponent.Position:ToVector2())
 				
-				if dist < distTemp then
-					goto skip_set_target
+				if self.target.StateComponent.CurrentStateName == "DEAD" or distTemp < dist then
+					dist = distTemp
+					self.target = p
 				end
 				
-				dist = distTemp
-				self.target = p
 				::skip_set_target::
 			end
 		end

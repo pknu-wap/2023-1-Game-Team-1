@@ -16,7 +16,7 @@ void OnBeginPlay()
 	
 	self.BossAIComponent.detectDistance = 3
 	
-	self.BossComponent.stateComponent:AddState("Chase")
+	self.BossComponent.stateComponent:AddState("CHASE")
 	self.BossComponent.stateComponent:AddState("ATTACK1")
 	self.BossComponent.stateComponent:AddState("ATTACK2")
 	self.BossComponent.stateComponent:AddState("ATTACK3")
@@ -159,7 +159,7 @@ HandleStump_Pattern_Event(Stump_Pattern_Event event)
 			_TimerService:SetTimerOnce(function() self:SpawnBat() end, 1.5)
 			self:AttackStateTimer(2.7)
 			self.BossComponent.stateComponent:ChangeState("ATTACK3")
-		elseif PtNo >= 1 and PtNo <= 3 then
+		elseif PtNo > 0 and PtNo <= 3 then
 			--self:teleport()
 			self.attackName = "teleport"
 			_TimerService:SetTimerOnce(function() self:teleport() end, 0.9)

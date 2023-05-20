@@ -1,7 +1,7 @@
 --Properties--
 
-number speed = 3
-number duration = 3
+number speed = 5
+number duration = 1.5
 number damage = 500
 Component transformComponent
 boolean ToLeft = true
@@ -16,7 +16,7 @@ void OnBeginPlay()
 {
 	self.transformComponent = self.Entity.TransformComponent
 	self.bossTransform = _EntityService:GetEntityByTag("Boss").TransformComponent
-	_TimerService:SetTimerOnce(function() self:BatAttack() end, self.duration)
+	_TimerService:SetTimerOnce(function() self:IceBolt() end, self.duration)
 	
 	if self.bossTransform.Scale.x < 0 then
 		self.ToLeft = false
@@ -43,12 +43,16 @@ integer CalcDamage(Entity attacker, Entity defender, string attackInfo)
 }
 
 [Default]
-void BatAttack()
+void IceBolt()
 {
 	local triggerComponent = self.Entity.TriggerComponent
-	local boomPos = Vector3(self.transformComponent.Position.x + (0.5 * (self.ToLeft == true and -1 or 1)), self.transformComponent.Position.y, self.transformComponent.Position.z )
-	_EffectService:PlayEffect("005d606301de46798afdc5b8f2283352", self.Entity, boomPos, 0, Vector3.one, false)
-	local shape = BoxShape(Vector2(self.transformComponent.Position.x, self.transformComponent.Position.y), Vector2(triggerComponent.BoxSize.x+1, triggerComponent.BoxSize.y+1), 0)
+	local boomPos = Vector3(self.transformComponent.Position.x, self.transformComponent.Position.y -0.5, self.transformComponent.Position.z )
+	local boomScale = Vector3.one
+	if self.bossTransform.Scale.x < 0 then
+		boomScale.x = -1
+	end
+	_EffectService:PlayEffect("33ac4bcaebbb468d93e39acd4edf9869", self.Entity, boomPos, 0, boomScale, false)
+	local shape = BoxShape(Vector2(self.transformComponent.Position.x, self.transformComponent.Position.y), Vector2(3.2, 1.5), 0)
 	
 	self:AttackFast(shape, nil, CollisionGroups.Player)	
 	
@@ -70,7 +74,7 @@ HandleTriggerEnterEvent(TriggerEnterEvent event)
 	local TriggerBodyEntity = event.TriggerBodyEntity
 	---------------------------------------------------------
 	if isvalid(TriggerBodyEntity.PlayerComponent) then
-		self:BatAttack()
+		self:IceBolt()
 	end
 	
 }
