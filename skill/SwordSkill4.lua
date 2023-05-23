@@ -1,26 +1,8 @@
 --Properties--
 
 string skillName = "Skill4"
-Component playerComponent
-Component stateComponent
 Component rigidbodyComponent
 Component controllerComponent
-table upChargeRate
-table coefficient
-number startDelay = 0
-number totalDelay = 0
-table attackSize
-table attackOffset
-integer timerId = 0
-integer timerId2 = 0
-integer timerId3 = 0
-number remainCoolTime = 0
-number skillCoolTime = 0
-integer mpConsumption = 0
-table effectRUID
-table hitEffectRUID
-table soundRUID
-table hitSoundRUID
 
 
 --Methods--
@@ -33,6 +15,7 @@ void OnBeginPlay()
 		self.stateComponent = _UserService.LocalPlayer.StateComponent
 		self.rigidbodyComponent = _UserService.LocalPlayer.RigidbodyComponent
 		self.controllerComponent = _UserService.LocalPlayer.PlayerControllerComponent
+		self.hitComponent = _UserService.LocalPlayer.PlayerHit
 	end
 	
 	local skillData = _DataService:GetTable("SwordSkillData")
@@ -57,25 +40,15 @@ void OnBeginPlay()
 }
 
 [Client]
-void PreSkill()
-{
-	if self.stateComponent.CurrentStateName ~= "IDLE" and self.stateComponent.CurrentStateName ~= "MOVE" and self.stateComponent.CurrentStateName ~= "ATTACK_WAIT" or self.remainCoolTime > 0 or self.playerComponent.Mp < self.mpConsumption then return end
-	self.stateComponent:ChangeState("SKILL")
-	self.playerComponent:MpConsume(self.mpConsumption)
-	self:CalcCoolTime()
-	self.timerId = _TimerService:SetTimerOnce(self.UseSkillClient, self.startDelay - self.startDelay * (self.playerComponent.atkSpeed - 1))
-}
-
-[Client]
 void UseSkillClient()
 {
 	self:UseSkillServer(_UserService.LocalPlayer)
 	local e = ActionStateChangedEvent("stabO1", "stabO1", 1.75 * self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
-	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay - self.totalDelay * (self.playerComponent.atkSpeed - 1))
+	self.hitComponent.skillTimer1 = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay - self.totalDelay * (self.playerComponent.atkSpeed - 1))
 	_ActionChange:SendToServer(_UserService.LocalPlayer, e)
 	_SoundService:PlaySound(self.soundRUID[1], 0.75)
-	self.timerId2 = _TimerService:SetTimerOnce(self.UseSkillClient2, 0.55 - 0.55 * (self.playerComponent.atkSpeed - 1))
-	self.timerId3 = _TimerService:SetTimerOnce(self.UseSkillClient3, 1.2 - 1.2 * (self.playerComponent.atkSpeed - 1))
+	self.hitComponent.skillTimer2 = _TimerService:SetTimerOnce(self.UseSkillClient2, 0.55 - 0.55 * (self.playerComponent.atkSpeed - 1))
+	self.hitComponent.skillTimer3 = _TimerService:SetTimerOnce(self.UseSkillClient3, 1.2 - 1.2 * (self.playerComponent.atkSpeed - 1))
 }
 
 [Client]
@@ -120,53 +93,9 @@ void UseSkillServer3(Entity player)
 	_EffectService:PlayEffectAttached(self.effectRUID[3], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
 	_TimerService:SetTimerOnce(function()
 			player.AttackComponent:Attack(self.attackSize[3], self.attackOffset[3] * player.PlayerControllerComponent.LookDirectionX, "Skill4-3", CollisionGroups.Monster)
-		end, 0.15)
-}
-
-[Client Only]
-void ChangeStateToIDLE()
-{
-	if self.stateComponent.CurrentStateName == "SKILL" then
-		self.stateComponent:ChangeState("IDLE")
-	end
-}
-
-[Client]
-void CalcCoolTime()
-{
-	self.remainCoolTime = self.skillCoolTime
-	local coolTimer = 0
-	local CheckCoolTime = function()
-		self.remainCoolTime = self.remainCoolTime - 1
-		log(self.remainCoolTime)
-		if self.remainCoolTime <= 0 then _TimerService:ClearTimer(coolTimer) end
-		end
-	coolTimer = _TimerService:SetTimerRepeat(CheckCoolTime, 1, 1)
+		end, 0.15 - 0.15 * (player.ExtendPlayerComponent.atkSpeed - 1))
 }
 
 
 --Events--
-
-[Default]
-HandleHitEvent(HitEvent event)
-{
-	--------------- Native Event Sender Info ----------------
-	-- Sender: HitComponent
-	-- Space: Server, Client
-	---------------------------------------------------------
-	
-	-- Parameters
-	local AttackCenter = event.AttackCenter
-	local AttackerEntity = event.AttackerEntity
-	local Damages = event.Damages
-	local Extra = event.Extra
-	local FeedbackAction = event.FeedbackAction
-	local IsCritical = event.IsCritical
-	local TotalDamage = event.TotalDamage
-	---------------------------------------------------------
-	if self:IsServer() then return end
-	_TimerService:ClearTimer(self.timerId)
-	_TimerService:ClearTimer(self.timerId2)
-	_TimerService:ClearTimer(self.timerId3)
-}
 

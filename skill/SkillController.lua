@@ -38,6 +38,9 @@ HandleKeyDownEvent(KeyDownEvent event)
 	
 	elseif key == KeyboardKey.X then
 		_SkillManager:Dash()
+		
+	elseif key == KeyboardKey.Backspace then
+		log(_UserService.LocalPlayer.Name)
 	end
 }
 
