@@ -16,10 +16,10 @@ void OnBeginPlay()
 	
 	self.BossAIComponent.detectDistance = 3
 	
-	self.BossComponent.stateComponent:AddState("CHASE")
-	self.BossComponent.stateComponent:AddState("ATTACK1")
-	self.BossComponent.stateComponent:AddState("ATTACK2")
-	self.BossComponent.stateComponent:AddState("ATTACK3")
+	self.BossComponent.stateComponent:AddState("CHASE", chase)
+	self.BossComponent.stateComponent:AddState("ATTACK1", attack1)
+	self.BossComponent.stateComponent:AddState("ATTACK2", attack2)
+	self.BossComponent.stateComponent:AddState("ATTACK3", attack3)
 	self.Entity.MovementComponent.InputSpeed = self.speed
 }
 
@@ -201,6 +201,54 @@ HandleStateChangeEvent(StateChangeEvent event)
 		end
 		
 		_TimerService:SetTimerOnce(spawnEffect, 1.8)
+	end
+}
+
+[Default]
+HandlePattern_Event(Pattern_Event event)
+{
+	-- Parameters
+	local PtNo = event.PtNo
+	---------------------------------------------------------
+	if self.BossComponent.InRange then
+		if PtNo >= 0 and PtNo <= 5 then
+			self.attackName = "normal"
+			self.BossComponent.stateComponent:ChangeState("ATTACK1")
+			self:NormalAttack()
+		elseif PtNo >= 6 and PtNo <= 8 then
+			_TimerService:SetTimerOnce(function() self:SpawnBat() end, 1.5)
+			self:AttackStateTimer(2.7)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+		elseif PtNo >= 9 then
+			self.attackName = "spawnSpirit"
+			_TimerService:SetTimerOnce(function() self:SpawnSpirit() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+			self:AttackStateTimer(3)
+		end
+		
+		self:AttackStateTimer(3)
+	else
+		if PtNo == 0 then
+			_TimerService:SetTimerOnce(function() self:SpawnBat() end, 1.5)
+			self:AttackStateTimer(2.7)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+		elseif PtNo > 0 and PtNo <= 3 then
+			--self:teleport()
+			self.attackName = "teleport"
+			_TimerService:SetTimerOnce(function() self:teleport() end, 0.9)
+			self:AttackStateTimer(3)
+			self.BossComponent.stateComponent:ChangeState("ATTACK1")
+		elseif PtNo > 3 and PtNo <= 6 then
+			self.attackName = "spawnSpirit"
+			_TimerService:SetTimerOnce(function() self:SpawnSpirit() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+			self:AttackStateTimer(3)
+		elseif PtNo > 6 then
+			self.attackName = "BoomStone"
+			_TimerService:SetTimerOnce(function() self:SpawnExplosionStone() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+			self:AttackStateTimer(3)
+		end
 	end
 }
 

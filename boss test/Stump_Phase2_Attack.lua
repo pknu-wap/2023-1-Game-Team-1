@@ -21,13 +21,13 @@ void OnBeginPlay()
 	
 	self.BossAIComponent.detectDistance = 3
 	
-	self.BossComponent.stateComponent:AddState("Chase")
-	self.BossComponent.stateComponent:AddState("ATTACK1")
-	self.BossComponent.stateComponent:AddState("ATTACK2")
-	self.BossComponent.stateComponent:AddState("ATTACK3")
-	self.BossComponent.stateComponent:AddState("ATTACK4")
-	self.BossComponent.stateComponent:AddState("ATTACK5")
-	self.BossComponent.stateComponent:AddState("ATTACK6")
+	self.BossComponent.stateComponent:AddState("Chase", chase)
+	self.BossComponent.stateComponent:AddState("ATTACK1", attack1)
+	self.BossComponent.stateComponent:AddState("ATTACK2", attack2)
+	self.BossComponent.stateComponent:AddState("ATTACK3", attack3)
+	self.BossComponent.stateComponent:AddState("ATTACK4", attack4)
+	self.BossComponent.stateComponent:AddState("ATTACK5", attack5)
+	self.BossComponent.stateComponent:AddState("ATTACK6", attack6)
 	self.Entity.MovementComponent.InputSpeed = self.speed
 }
 
@@ -256,5 +256,75 @@ HandleStateChangeEvent(StateChangeEvent event)
 		log("클리어")
 		self.Entity:Destroy()
 	end
+}
+
+[Default]
+HandlePattern_Event(Pattern_Event event)
+{
+	-- Parameters
+	local PtNo = event.PtNo
+	---------------------------------------------------------
+	if self.BossComponent.Hp < self.BossComponent.MaxHp/2 and self.canSpecial == true then
+		self:SpecialAttack()
+		self.damage = 1000
+		self:AttackStateTimer(2.6)
+		
+		self.canSpecial = false
+		
+		_TimerService:SetTimerOnce(function() self.canSpecial = true end, 300)
+		goto skip_attack
+	end
+	
+	if self.BossComponent.InRange then
+		if PtNo >= 0 and PtNo <= 3 then
+			--self.attackName = "normal"
+			self.damage = 200
+			self.BossComponent.stateComponent:ChangeState("ATTACK1")
+			self:NormalAttack()
+			self:AttackStateTimer(2.7)
+		elseif PtNo > 3 and PtNo < 6 then
+			--self.attackName = "breath"
+			self.damage = 500
+			self.BossComponent.stateComponent:ChangeState("ATTACK2")
+			self:Breath()
+			self:AttackStateTimer(2.1)
+		elseif PtNo >= 6 and PtNo <= 8 then
+			_TimerService:SetTimerOnce(function() self:SpawnBat() end, 1.5)
+			self:AttackStateTimer(2.5)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+		elseif PtNo >= 9 then
+			--self.attackName = "spawnSpirit"
+			_TimerService:SetTimerOnce(function() self:SpawnSpirit() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK6")
+			self:AttackStateTimer(2.5)
+		end
+	else
+		if PtNo == 0 then
+			_TimerService:SetTimerOnce(function() self:SpawnBat() end, 1.5)
+			self:AttackStateTimer(2.5)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+		elseif PtNo >= 1 and PtNo <= 3 then
+			--self.attackName = "teleport"
+			self.damage = 500
+			_TimerService:SetTimerOnce(function() self:teleport() end, 0.9)
+			self:AttackStateTimer(2.7)
+			self.BossComponent.stateComponent:ChangeState("ATTACK1")
+		elseif PtNo == 4 then
+			self:Heal()
+			self:AttackStateTimer(2.6)
+			self.BossComponent.stateComponent:ChangeState("ATTACK5")
+		elseif PtNo > 4 and PtNo <= 6 then
+			--self.attackName = "spawnSpirit"
+			_TimerService:SetTimerOnce(function() self:SpawnSpirit() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK6")
+			self:AttackStateTimer(2.5)
+		elseif PtNo > 6 then
+			--self.attackName = "BoomStone"
+			_TimerService:SetTimerOnce(function() self:SpawnExplosionStone() end, 0.9)
+			self.BossComponent.stateComponent:ChangeState("ATTACK3")
+			self:AttackStateTimer(2.5)
+		end
+	end
+	::skip_attack::
 }
 

@@ -44,11 +44,13 @@ void OnBeginPlay()
 	Chase.BossAIComponent = self.Entity.BossAIComponent
 	
 	self.ATK = RandomSelectorNode()
+	local atk = RandomSelectorNode()
 	
 	if self.ATK ~= nil then
 		--log("ATK 잘들어가있듬")
 	end
 	
+	--[[
 	local Pt = {}
 	
 	if  self.Entity.TagComponent.Tags[2] == "Stump" then
@@ -67,14 +69,26 @@ void OnBeginPlay()
 			self.ATK:AttachChild(Pt[i])
 			self.ATK:SetChildNodeProbability(Pt[i], 0.15)
 		end
+	elseif self.Entity.TagComponent.Tags[2] == "KnightStatue" then
+		log("기사석상 패턴 로드")
+		for i = 0,9 do
+			Pt[i] = KnightStatue_Pattern()
+			Pt[i].PtNo = i
+			self.ATK:AttachChild(Pt[i])
+			self.ATK:SetChildNodeProbability(Pt[i], 0.15)
+		end
 	end
-		
+	]]	
+	local Pt = Pattern()
+	atk:AttachChild(Pt, 1)
+	
 	local Attacking = Attacking()
 	Attacking.BossAIComponent = self.Entity.BossAIComponent
 	
 	Seq:AttachChild(CA)
 	Seq:AttachChild(Chase)
-	Seq:AttachChild(self.ATK)
+	--Seq:AttachChild(self.ATK)
+	Seq:AttachChild(atk)
 	Seq:AttachChild(Attacking)
 	
 	repeater:AttachChild(Seq)
@@ -114,8 +128,10 @@ void SetPlayer()
 		log("타겟 재설정")
 	end
 	
+	local playersArr = _UserService:GetUsersByMapName(self.Entity.CurrentMap.Name)
+	
 	--og("어디서 오류 ? 1")
-	for i, p in pairs(self.player) do
+	for i, p in pairs(playersArr) do
 		--log("어디서 오류 ? 2")
 		if self.target == nil then
 			--log("어디서 오류 ? 3")
@@ -139,6 +155,16 @@ void SetPlayer()
 			end
 		end
 		
+	end
+}
+
+[Default]
+void RemovePlayer(string UserId)
+{
+	for i, p in pairs(self.player) do
+		if self.player[i].Name == UserId then
+			table.remove(self.player, i)
+		end
 	end
 }
 

@@ -20,16 +20,16 @@ void OnBeginPlay()
 	
 	self.BossAIComponent.detectDistance = 1
 	
-	self.BossComponent.stateComponent:AddState("CHASE")
-	self.BossComponent.stateComponent:AddState("skill")
+	self.BossComponent.stateComponent:AddState("CHASE", chase)
+	self.BossComponent.stateComponent:AddState("skill", attack1)
 	
 	self.Entity.MovementComponent.InputSpeed = self.speed
 	self.StateAnimationComponent = self.Entity.StateAnimationComponent
 	
-	self.curState = "파이어골렘"
-	--self:StoneGolemState()
-	self:FireGolemState()
-	_TimerService:SetTimerOnce(function() self.isChangeState = true end, 5)
+	self.curState = "스톤골렘"
+	self:StoneGolemState()
+	
+	_TimerService:SetTimerOnce(function() self.isChangeState = true end, 30)
 }
 
 [Server Only]
@@ -208,7 +208,7 @@ void IceGolemAttack(number PtNo)
 				startPos = startPos + Vector3(-0.5, 0, 0)
 			end
 		end
-		self:AttackStateTimer(2.7)
+		self:AttackStateTimer(3.42)
 	else
 		local pos = Vector3.zero
 		
@@ -220,16 +220,24 @@ void IceGolemAttack(number PtNo)
 		
 		_SpawnService:SpawnByModelId("model://0552d888-ab72-4931-9c3f-3cdabea2d64c", "icebolt" ,pos, self.Entity.Parent)
 		
-		self:AttackStateTimer(0.9)
+		self:AttackStateTimer(1.14)
 	end
 }
 
 [Default]
 void FireGolemAttack(number PtNo)
 {
-	self.BossComponent.stateComponent:ChangeState("IDLE")
+	self.BossComponent.stateComponent:ChangeState("SKILL")
 	
-	self:AttackStateTimer(3)
+	for i = 1,3 do
+		local randomNum = math.random(-9, 8)
+		
+		local pos = Vector3(randomNum, -0.2, 0)
+		
+		_SpawnService:SpawnByModelId("model://67887212-d8fb-4acc-aa35-2b9a14d1cd87", "meteor", pos, self.Entity.Parent)
+	end
+	
+	self:AttackStateTimer(3.42)
 }
 
 [Default]
@@ -282,5 +290,26 @@ HandleGolem_Pattern_Event(Golem_Pattern_Event event)
 		end
 	end
 	
+}
+
+[Default]
+HandlePattern_Event(Pattern_Event event)
+{
+	-- Parameters
+	local PtNo = event.PtNo
+	---------------------------------------------------------
+	log("PtNo : " ..PtNo)
+	if self.isChangeState == true then
+		self.isChangeState = false
+		self:ChangeState()
+	else
+		if self.curState == "스톤골렘" then
+			self:StoneGolemAttack(PtNo)
+		elseif self.curState == "아이스골렘" then
+			self:IceGolemAttack(PtNo)
+		elseif self.curState == "파이어골렘" then
+			self:FireGolemAttack(PtNo)
+		end
+	end
 }
 
