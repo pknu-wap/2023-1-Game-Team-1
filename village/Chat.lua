@@ -13,6 +13,8 @@ Component scriptText
 Entity ui
 Entity uiDialog
 Entity btnComplete
+string playerName = nil
+Entity avatar
 
 
 --Methods--
@@ -31,6 +33,7 @@ void OnBeginPlay()
 	
 	-- 이벤트 연결
 	
+	self.playerName = _UserService.LocalPlayer.PlayerComponent.Nickname
 	self.ui.Enable = true
 	self.uiDialog.Enable = true
 	self.btnPrev:ConnectEvent(ButtonClickEvent, self.OnClickBtnPrev)
@@ -41,8 +44,20 @@ void OnBeginPlay()
 [Client]
 void UpdateUI(number idx)
 {
-	self.nameText.Text = self.names[idx]
-	self.imageSprite.ImageRUID = self.images[idx]
+	if self.names[idx] == "playerName" then
+		self.nameText.Text = self.playerName
+	else
+		self.nameText.Text = self.names[idx]
+	end
+	
+	if self.images[idx] == "playerImage" then
+		self.avatar.Enable = true
+		self.imageSprite.ImageRUID = "3e9d52ed52d64794bbd6f72bab8ee3d9"
+	else
+		self.avatar.Enable = false
+		self.imageSprite.ImageRUID = self.images[idx]
+	end
+	
 	self.scriptText.Text = self.scripts[idx]
 	
 	self.btnPrev.Enable = (idx ~= 1)
