@@ -4,6 +4,7 @@ string skillName = "UltimateSkill"
 Component playerComponent
 Component stateComponent
 number coefficient = 0
+number upChargeRate = 0
 number startDelay = 0
 number totalDelay = 0
 Vector2 attackSize = Vector2(0,0)
@@ -32,6 +33,7 @@ void OnBeginPlay()
 	local row = skillData:FindRow("Name", self.skillName)
 	
 	self.coefficient = tonumber(row:GetItem("Coefficient"))
+	self.upChargeRate = tonumber(row:GetItem("UpChargeRate"))
 	self.startDelay = tonumber(row:GetItem("StartDelay"))
 	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
 	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))

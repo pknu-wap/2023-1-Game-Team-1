@@ -4,6 +4,7 @@ string skillName = "Skill5"
 Component playerComponent
 Component stateComponent
 table coefficient
+table upChargeRate
 number startDelay = 0
 number totalDelay = 0.7
 Vector2 attackSize = Vector2(0,0)
@@ -33,6 +34,7 @@ void OnBeginPlay()
 	local row = skillData:FindRow("Name", self.skillName)
 	
 	self.coefficient = _DataSetToTable:GetNumberTable(row:GetItem("Coefficient"))
+	self.upChargeRate = _DataSetToTable:GetNumberTable(row:GetItem("UpChargeRate"))
 	self.startDelay = tonumber(row:GetItem("StartDelay"))
 	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
 	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))
