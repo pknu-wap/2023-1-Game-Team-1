@@ -6,6 +6,7 @@ Component stateComponent
 Component rigidbodyComponent
 Component controllerComponent
 Component hitComponent
+number upChargeRate = 0
 number coefficient = 0
 number startDelay = 0
 number totalDelay = 0
@@ -37,7 +38,8 @@ void OnBeginPlay()
 	local skillData = _DataService:GetTable("SwordSkillData")
 	local row = skillData:FindRow("Name", self.skillName)
 	local row2 = skillData:FindRow("Name", "Skill3 - Counter")
-	self.coefficient = tonumber("Coefficient")
+	self.coefficient = tonumber(row:GetItem("Coefficient"))
+	self.upChargeRate = tonumber(row:GetItem("UpChargeRate"))
 	self.startDelay = tonumber(row:GetItem("StartDelay"))
 	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
 	self.attackSize = Vector2(tonumber(row:GetItem("AttackSize.x")), tonumber(row:GetItem("AttackSize.y")))

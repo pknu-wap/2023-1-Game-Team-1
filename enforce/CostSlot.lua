@@ -1,7 +1,10 @@
 --Properties--
 
 string value = ""
+<<<<<<< HEAD
 boolean disable = false
+=======
+>>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 
 
 --Methods--
@@ -18,7 +21,11 @@ void Update()
 {
 	local children = self.Entity.Children
 	children[2].TextComponent.Text = _Util:NumberComma(self.value)
+<<<<<<< HEAD
 	if self.disable and (self.value == "0" or self.value == "") then
+=======
+	if self.value == "0" or self.value == "" then
+>>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 		self.Entity:SetEnable(false)
 	else
 		self.Entity:SetEnable(true)

@@ -30,7 +30,7 @@ any OnBehave(number delta)
 void OnInit()
 {
 	if self.player == nil then
-		log("Checker 플레이어 셋")
+		--log("Checker 플레이어 셋")
 		local bossAIcomponent = self.ParentAI.Entity.BossAIComponent
 		
 	end

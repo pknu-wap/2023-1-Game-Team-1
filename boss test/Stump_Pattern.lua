@@ -11,6 +11,7 @@ void OnInit()
 {
 	self.BossAIComponent = self.ParentAI.Entity.BossAIComponent
 	self.ExclusiveExecutionWhenRunning = true
+	log("패턴 들어가기전 스텀프 상태" ..self.BossAIComponent.BossComponent.stateComponent.CurrentStateName)
 }
 
 [Default]
@@ -22,7 +23,7 @@ any OnBehave(number delta)
 		return BehaviourTreeStatus.Failure
 	end
 	if self.BossAIComponent.BossComponent.stateComponent.CurrentStateName ~= "CHASE" then
-		log("움직이지 않습니다 ")
+		log("움직이지 않습니다 " ..self.BossAIComponent.BossComponent.stateComponent.CurrentStateName )
 		return BehaviourTreeStatus.Failure
 	end
 	

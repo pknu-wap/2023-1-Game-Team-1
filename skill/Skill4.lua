@@ -5,6 +5,7 @@ Component playerComponent
 Component stateComponent
 Component rigidbodyComponent
 Component controllerComponent
+table upChargeRate
 table coefficient
 number startDelay = 0
 number totalDelay = 0
@@ -42,10 +43,11 @@ void OnBeginPlay()
 	local attackOffsetY = _DataSetToTable:GetNumberTable(row:GetItem("AttackOffset.y"))
 	
 	self.coefficient = _DataSetToTable:GetNumberTable(row:GetItem("Coefficient"))
+	self.upChargeRate = _DataSetToTable:GetNumberTable(row:GetItem("UpChargeRate"))
 	self.startDelay = tonumber(row:GetItem("StartDelay"))
 	self.totalDelay = tonumber(row:GetItem("TotalDelay"))
-	self.attackSize = {Vector2(attackSizeX[1], attackSizeY[2]), Vector2(attackSizeX[2], attackSizeY[2]), Vector2(attackSizeX[3], attackSizeY[3])}
-	self.attackOffset = {Vector2(attackOffsetX[1], attackOffsetY[2]), Vector2(attackOffsetX[2], attackOffsetY[2]), Vector2(attackOffsetX[3], attackOffsetY[3])}
+	self.attackSize = {Vector2(attackSizeX[1], attackSizeY[1]), Vector2(attackSizeX[2], attackSizeY[2]), Vector2(attackSizeX[3], attackSizeY[3])}
+	self.attackOffset = {Vector2(attackOffsetX[1], attackOffsetY[1]), Vector2(attackOffsetX[2], attackOffsetY[2]), Vector2(attackOffsetX[3], attackOffsetY[3])}
 	self.skillCoolTime = tonumber(row:GetItem("CoolTime"))
 	self.mpConsumption = tonumber(row:GetItem("MpConsumption"))
 	self.effectRUID = _DataSetToTable:GetStringTable(row:GetItem("EffectRUID"))
@@ -67,28 +69,36 @@ void PreSkill()
 [Client]
 void UseSkillClient()
 {
-	self:UseSkillServer1(_UserService.LocalPlayer)
-	local e1 = ActionStateChangedEvent("stabO1", "stabO1", 1.75 * self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
-	local e2 = ActionStateChangedEvent("swingTF", "swingTF", 1.25 * self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
-	local e3 = ActionStateChangedEvent("swingT1", "swingT1", 1.25* self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
+	self:UseSkillServer(_UserService.LocalPlayer)
+	local e = ActionStateChangedEvent("stabO1", "stabO1", 1.75 * self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
 	self.timerId = _TimerService:SetTimerOnce(self.ChangeStateToIDLE, self.totalDelay - self.totalDelay * (self.playerComponent.atkSpeed - 1))
-	_ActionChange:SendToServer(_UserService.LocalPlayer, e1)
+	_ActionChange:SendToServer(_UserService.LocalPlayer, e)
 	_SoundService:PlaySound(self.soundRUID[1], 0.75)
-	self.timerId2 = _TimerService:SetTimerOnce(function()
-			self:UseSkillServer2(_UserService.LocalPlayer)
-			self.rigidbodyComponent:AddForce(Vector2(15, 0) * self.controllerComponent.LookDirectionX)
-			_ActionChange:SendToServer(_UserService.LocalPlayer, e2)
-			_SoundService:PlaySound(self.soundRUID[2], 0.75)
-		end, 0.55 - 0.55 * (self.playerComponent.atkSpeed - 1))
-	self.timerId3 = _TimerService:SetTimerOnce(function()
-			self:UseSkillServer3(_UserService.LocalPlayer)
-			_ActionChange:SendToServer(_UserService.LocalPlayer, e3)
-			_SoundService:PlaySound(self.soundRUID[3], 0.75)
-		end, 1.2 - 1.2 * (self.playerComponent.atkSpeed - 1))
+	self.timerId2 = _TimerService:SetTimerOnce(self.UseSkillClient2, 0.55 - 0.55 * (self.playerComponent.atkSpeed - 1))
+	self.timerId3 = _TimerService:SetTimerOnce(self.UseSkillClient3, 1.2 - 1.2 * (self.playerComponent.atkSpeed - 1))
+}
+
+[Client]
+void UseSkillClient2()
+{
+	local e = ActionStateChangedEvent("swingTF", "swingTF", 1.25 * self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
+	self:UseSkillServer2(_UserService.LocalPlayer)
+	self.rigidbodyComponent:AddForce(Vector2(15, 0) * self.controllerComponent.LookDirectionX)
+	_ActionChange:SendToServer(_UserService.LocalPlayer, e)
+	_SoundService:PlaySound(self.soundRUID[2], 0.75)
+}
+
+[Client]
+void UseSkillClient3()
+{
+	local e = ActionStateChangedEvent("swingT1", "swingT1", 1.25* self.playerComponent.atkSpeed, SpriteAnimClipPlayType.Onetime)
+	self:UseSkillServer3(_UserService.LocalPlayer)
+	_ActionChange:SendToServer(_UserService.LocalPlayer, e)
+	_SoundService:PlaySound(self.soundRUID[3], 0.75)
 }
 
 [Server]
-void UseSkillServer1(Entity player)
+void UseSkillServer(Entity player)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
 	_EffectService:PlayEffectAttached(self.effectRUID[1], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})

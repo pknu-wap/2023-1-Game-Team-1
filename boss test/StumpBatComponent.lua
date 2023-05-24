@@ -70,7 +70,6 @@ HandleTriggerEnterEvent(TriggerEnterEvent event)
 	local TriggerBodyEntity = event.TriggerBodyEntity
 	---------------------------------------------------------
 	if isvalid(TriggerBodyEntity.PlayerComponent) then
-		log("배트 부딫힘")
 		self:BatAttack()
 	end
 	

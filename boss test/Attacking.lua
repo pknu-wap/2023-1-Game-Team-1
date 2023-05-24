@@ -23,6 +23,7 @@ any OnBehave(number delta)
 		return BehaviourTreeStatus.Running
 	else
 		self.BossAIComponent.BossComponent.stateComponent:ChangeState("IDLE")
+		self.BossAIComponent.target = nil
 		return BehaviourTreeStatus.Success
 	end
 }

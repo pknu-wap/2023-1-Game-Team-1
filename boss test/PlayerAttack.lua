@@ -20,7 +20,7 @@ void AttackNormal()
 		local attackOffset = Vector2(worldPosition.x + 0.5 * playerController.LookDirectionX, worldPosition.y + 0.5)
 		self._T.shape.Position = attackOffset
 		
-		self:AttackFast(self._T.shape, nil, CollisionGroups.Monster)
+		self:AttackFast(self._T.shape, "Normal", CollisionGroups.Monster)
 	end
 }
 

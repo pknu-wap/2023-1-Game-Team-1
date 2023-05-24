@@ -28,43 +28,50 @@ void OnBeginPlay()
 [Default]
 void Skill1()
 {
-	self.skill1:PreSkill()
+	--self.skill1:PreSkill()
+	_SwordSkill1:PreSkill()
 }
 
 [Default]
 void Skill2()
 {
-	self.skill2:PreSkill()
+	--self.skill2:PreSkill()
+	_SwordSkill2:PreSkill()
 }
 
 [Default]
 void Skill3()
 {
-	self.skill3:PreSkill()
+	--self.skill3:PreSkill()
+	_SwordSkill3:PreSkill()
 }
 
 [Default]
 void Skill4()
 {
-	self.skill4:PreSkill()
+	--self.skill4:PreSkill()
+	_SwordSkill4:PreSkill()
 }
 
 [Default]
 void Skill5()
 {
-	self.skill5:PreSkill()
+	--self.skill5:PreSkill()
+	_SwordSkill5:PreSkill()
 }
 
 [Default]
 void UltimateSkill()
 {
-	self.ultimateSkill:PreSkill()
+	--self.ultimateSkill:PreSkill()
+	_SwordUltimateSkill:PreSkill()
 }
 
 [Default]
 void Dash()
 {
-	self.dash:PreSkill()
+	--self.dash:PreSkill()
+	_SwordDash:PreSkill()
 }
 
 

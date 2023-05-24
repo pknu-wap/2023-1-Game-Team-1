@@ -9,7 +9,7 @@ number attackInterval = 0.03
 void OnBeginPlay()
 {
 	local monster = self.Entity.Boss
-	log("몬스터 " , monster)
+	--log("몬스터 " , monster)
 	if not monster then
 		return
 	end
