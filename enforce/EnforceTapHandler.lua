@@ -20,13 +20,13 @@ void OnBeginPlay()
 	self.tapPageTable["center"] = {}
 	self.tapStateTable["center"] = {}
 	
-	self.tapButtonTable["left"][1] = _EntityService:GetEntity(_EnforceEnum.LeftTapInfoButtonId)
-	self.tapButtonTable["left"][2] = _EntityService:GetEntity(_EnforceEnum.LeftTapSelectButtonId)
+	self.tapButtonTable["left"][1] = _EntityService:GetEntity(_EnforceEnum.TapLeftInfoButtonId)
+	self.tapButtonTable["left"][2] = _EntityService:GetEntity(_EnforceEnum.TapLeftSelectButtonId)
 	self.tapButtonTable["left"][1]:ConnectEvent(ButtonClickEvent, function() self:TapOpen("left", "info") end)
 	self.tapButtonTable["left"][2]:ConnectEvent(ButtonClickEvent, function() self:TapOpen("left", "select") end)
 	
-	self.tapPageTable["left"][1] = _EntityService:GetEntity(_EnforceEnum.LeftTapInfoId)
-	self.tapPageTable["left"][2] = _EntityService:GetEntity(_EnforceEnum.LeftTapSelectId)
+	self.tapPageTable["left"][1] = _EntityService:GetEntity(_EnforceEnum.TapLeftInfoId)
+	self.tapPageTable["left"][2] = _EntityService:GetEntity(_EnforceEnum.TapLeftSelectId)
 	
 	self.tapStateTable["left"]["info"] = 1
 	self.tapStateTable["left"]["select"] = 2
@@ -34,19 +34,19 @@ void OnBeginPlay()
 	self.maxState["left"] = 2
 	
 	--woo : center Tap
-	self.tapButtonTable["center"][1] = _EntityService:GetEntity(_EnforceEnum.CenterTapEnforceButtonId)
-	self.tapButtonTable["center"][2] = _EntityService:GetEntity(_EnforceEnum.CenterTapScrollButtonId)
-	self.tapButtonTable["center"][3] = _EntityService:GetEntity(_EnforceEnum.CenterTapEnchantButtonId)
-	self.tapButtonTable["center"][4] = _EntityService:GetEntity(_EnforceEnum.CenterTapSuccessionButtonId)
+	self.tapButtonTable["center"][1] = _EntityService:GetEntity(_EnforceEnum.TapCenterEnforceButtonId)
+	self.tapButtonTable["center"][2] = _EntityService:GetEntity(_EnforceEnum.TapCenterScrollButtonId)
+	self.tapButtonTable["center"][3] = _EntityService:GetEntity(_EnforceEnum.TapCenterEnchantButtonId)
+	self.tapButtonTable["center"][4] = _EntityService:GetEntity(_EnforceEnum.TapCenterSuccessionButtonId)
 	self.tapButtonTable["center"][1]:ConnectEvent(ButtonClickEvent, function() self:TapOpen("center", "enforce") end)
 	self.tapButtonTable["center"][2]:ConnectEvent(ButtonClickEvent, function() self:TapOpen("center", "scroll") end)
 	self.tapButtonTable["center"][3]:ConnectEvent(ButtonClickEvent, function() self:TapOpen("center", "enchant") end)
 	self.tapButtonTable["center"][4]:ConnectEvent(ButtonClickEvent, function() self:TapOpen("center", "succession") end)
 	
-	self.tapPageTable["center"][1] = _EntityService:GetEntity(_EnforceEnum.CenterTapEnforceId)
-	self.tapPageTable["center"][2] = _EntityService:GetEntity(_EnforceEnum.CenterTapScrollId)
-	self.tapPageTable["center"][3] = _EntityService:GetEntity(_EnforceEnum.CenterTapEnchantId)
-	self.tapPageTable["center"][4] = _EntityService:GetEntity(_EnforceEnum.CenterTapSuccessionId)
+	self.tapPageTable["center"][1] = _EntityService:GetEntity(_EnforceEnum.TapCenterEnforceId)
+	self.tapPageTable["center"][2] = _EntityService:GetEntity(_EnforceEnum.TapCenterScrollId)
+	self.tapPageTable["center"][3] = _EntityService:GetEntity(_EnforceEnum.TapCenterEnchantId)
+	self.tapPageTable["center"][4] = _EntityService:GetEntity(_EnforceEnum.TapCenterSuccessionId)
 	
 	self.tapStateTable["center"]["enforce"] = 1
 	self.tapStateTable["center"]["scroll"] = 2
@@ -57,7 +57,7 @@ void OnBeginPlay()
 	
 	--woo : init
 	self:TapOpen("left", "info")
-	self:TapOpen("center", "enforce")
+	self:TapOpen("center", "scroll")
 }
 
 [Client]
@@ -74,22 +74,11 @@ void TapOpen(string location, string tap)
 		self.tapPageTable[location][i]:SetVisible(bool)
 		self.tapButtonTable[location][i].TextComponent.FontColor = color
 	end
-}
-
-[Client]
-void CenterTapOpen(string tap)
-{
-	self.centerTapState = self.centerTapStateTable[tap]
-	for i = 1, self.centerTapCount do
-		local color = Color.gray
-		local bool = false
-		if i == self.centerTapState then
-			color = Color.black
-			bool = true
-		end
-		self.centerTapPageTable[i]:SetVisible(bool)
-		self.centerTapButtonTable[i].TextComponent.FontColor = color
+	
+	if location == "center" then
+		--_EnforceClient:CostSlotUpdate(tap)
 	end
+	
 }
 
 

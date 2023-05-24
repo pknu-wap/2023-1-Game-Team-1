@@ -1,7 +1,6 @@
 --Properties--
 
 Entity currentSelected
-string userId = nil
 number currentIdx = -1
 string currentItemId = ""
 
@@ -11,10 +10,11 @@ string currentItemId = ""
 [Client]
 void Select(Entity selected, number idx, string itemId)
 {
-	if itemId ~= 0 then
+	if itemId ~= "" then
 		if self.currentIdx == idx then
 			self:Deselect()
-			_EnforceClient:LoadEnforcePage(itemId)
+			_EnforceClient:WeaponSelect(itemId, idx)
+			_EnforceTapHandler:TapOpen("left", "info")
 			
 		else
 			self:Deselect()
@@ -22,8 +22,6 @@ void Select(Entity selected, number idx, string itemId)
 			self.currentSelected = selected
 			self.currentIdx = idx
 			self.currentItemId = itemId
-			log(itemId)
-			
 		end
 	else
 		self:Deselect()
@@ -37,7 +35,7 @@ void Deselect()
 	self.currentSelected.Enable = false
 	self.currentSelected = nil
 	self.currentIdx = -1
-	self.currentItemId = 0
+	self.currentItemId = "0"
 }
 
 
