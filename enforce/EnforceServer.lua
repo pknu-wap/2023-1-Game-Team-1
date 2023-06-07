@@ -9,19 +9,14 @@ number MaxEnforceValue = 7
 [Server]
 void EnforceWeapon(string userId, string weaponId)
 {
-<<<<<<< HEAD
 	--확률따라 강화 성공 및 실패
 	local db = _DataStorageService:GetUserDataStorage(userId)
 	local enforceDataSet = _DataService:GetTable(_EnforceEnum.DataSetEnforce)
 	
-=======
-	local db = _DataStorageService:GetUserDataStorage(userId)
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 	local _, equipStatusJson = db:GetAndWait(_InventoryServer.equipStatusKey)
 	local equipStatus = _HttpService:JSONDecode(equipStatusJson)
 	local equip = equipStatus[weaponId]
 	local enforce = tonumber(equip["enforce"])
-<<<<<<< HEAD
 	local probability = tonumber(enforceDataSet:GetCell(enforce + 1, "Probability"))
 	
 	local randomNumber = math.random(1, 100)
@@ -34,10 +29,6 @@ void EnforceWeapon(string userId, string weaponId)
 		--강화 실패	
 		log("강화 실패..")
 	end
-=======
-	
-	equip["enforce"] = tostring(enforce + 1)
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 	
 	equipStatus[weaponId] = equip
 	equipStatusJson = _HttpService:JSONEncode(equipStatus)

@@ -112,10 +112,6 @@ void UpdateUI(string category)
 	--소울 -> 자원 으로 바꾸는 작업
 	local resource = self.data[self.resourceStatus]
 	self.soulSlot.Text = resource[_InventoryEnum.resourceSoul]
-<<<<<<< HEAD
-=======
-	log(resource)
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 }
 
 [Client]

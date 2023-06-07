@@ -385,11 +385,8 @@ table GetNewEquip(integer code, string id)
 	equip["enforce"] = "0"
 	equip["enforceAddAtk"] = "0"
 	
-<<<<<<< HEAD
 	
 	
-=======
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 	equip["finalAtkPoint"] = equip["baseAtkPoint"]
 	
 	return equip
@@ -405,13 +402,8 @@ void EquipDataCalculate(string userId, string id)
 	
 	--타입에 따라 나누기
 	if equip["type"] == "1" then
-<<<<<<< HEAD
 		local enforceData = _DataService:GetTable(_EnforceEnum.DataSetEnforce)
 		local equipData = _DataService:GetTable(_EnforceEnum.DataSetEquip)
-=======
-		local enforceData = _DataService:GetTable(_EnforceEnum.EnforceDataSet)
-		local equipData = _DataService:GetTable(_EnforceEnum.EquipDataSet)
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 		
 		local enforceValue = tonumber(equip["enforce"]) + 1
 		

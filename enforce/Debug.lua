@@ -19,12 +19,8 @@ Entity AddAllRuneButton
 Entity ResetAllRuneButton
 string userId = ""
 number soulValue = 10000
-<<<<<<< HEAD
 number stoneValue = 3
 number runeValue = 10
-=======
-number NewValue1 = 0
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 
 
 --Methods--
@@ -85,30 +81,21 @@ void Reset()
 void AddSoul()
 {
 	_InventoryServer:AddResource(self.userId, _EnforceEnum.ResourceSoul, self.soulValue)
-<<<<<<< HEAD
 	_EnforceClient:UpdateUI()
-=======
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 }
 
 [Client Only]
 void SubSoul()
 {
 	_InventoryServer:AddResource(self.userId, _EnforceEnum.ResourceSoul, self.soulValue * -1)
-<<<<<<< HEAD
 	_EnforceClient:UpdateUI()
-=======
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 }
 
 [Client Only]
 void SoulCopy()
 {
 	_InventoryServer:SetResource(self.userId, _EnforceEnum.ResourceSoul, 1000000)
-<<<<<<< HEAD
 	_EnforceClient:UpdateUI()
-=======
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 }
 
 [Client Only]
@@ -132,7 +119,6 @@ void OpenInventoryPopup()
 [Client]
 void AddEnforceStone()
 {
-<<<<<<< HEAD
 	_InventoryServer:AddResource(self.userId, _EnforceEnum.ResourceEnforceStone, self.stoneValue)
 	_EnforceClient:UpdateUI()
 }
@@ -151,8 +137,6 @@ void AddAllRune()
 void ResetEnforceStone()
 {
 	_InventoryServer:SetResource(self.userId, _EnforceEnum.ResourceEnforceStone, 0)
-=======
->>>>>>> c561ea44b3f888c6c1dd38870ced22a12f09fe6d
 	_EnforceClient:UpdateUI()
 }
 
