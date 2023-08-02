@@ -79,26 +79,26 @@ void UpdateUI()
 [Client]
 void UpdateInfo()
 {
-	-- EquipInfo update
-	local currentData = _oldUserDataClient:GetCurrentEquip()
-	
-	for idx, equip in ipairs(_EquipEnum.EquipList) do
-		local itemId = currentData[equip]
-		local RUID
-		
-		if itemId == "" then
-			itemId = nil
-			RUID = nil
-		else
-			RUID = _oldUserDataClient:GetEquipRUIDById(itemId)
-		end
-		
-		self.equipSlots[idx]:SetItem(itemId, RUID)
-	end
-	
-	-- StatusInfo update
-	local statusData = _oldUserDataClient:GetStatus()
-	local userData = _oldUserDataClient:GetUserData()
+	---- EquipInfo update
+	--local currentData = _oldUserDataClient:GetCurrentEquip()
+	--
+	--for idx, equip in ipairs(_EquipEnum.EquipList) do
+	--    local itemId = currentData[equip]
+	--    local RUID
+	--    
+	--    if itemId == "" then
+	--        itemId = nil
+	--        RUID = nil
+	--    else
+	--        RUID = _oldUserDataClient:GetEquipRUIDById(itemId)
+	--    end
+	--    
+	--    self.equipSlots[idx]:SetItem(itemId, RUID)
+	--end
+	--
+	---- StatusInfo update
+	--local statusData = _oldUserDataClient:GetStatus()
+	--local userData = _oldUserDataClient:GetUserData()
 	
 	
 	-- AvatarInfo update

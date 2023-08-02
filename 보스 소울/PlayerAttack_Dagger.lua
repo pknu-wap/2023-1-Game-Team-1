@@ -30,30 +30,25 @@ void AttackNormal()
 int CalcDamage(Entity attacker, Entity defender, string attackInfo)
 {
 	local dmg = 0
+	--if attackInfo == "dg1" then
+	--    _EffectService:PlayEffect(_DaggerSkill1.hitEffectRUID[1], defender.Parent, defender.TransformComponent.Position, 0, Vector3.one, false)
+	--    _SoundService:PlaySound(_DaggerSkill1.hitSoundRUID[1], 1.0, attacker.Name)
+	--    attacker.ExtendPlayerComponent:UpCharge(_DaggerSkill1.upChargeRate[1])
+	--    dmg = self.playerComponent.atkPoint^1.25 * _DaggerSkill1.coefficient[1]
+	--elseif attackInfo == "dg2" then
+	--    _EffectService:PlayEffect(_DaggerSkill2.hitEffectRUID[1], defender.Parent, defender.TransformComponent.Position, 0, Vector3.one, false)
+	--    _SoundService:PlaySound(_DaggerSkill2.hitSoundRUID[1], 1.0, attacker.Name)
+	--    attacker.ExtendPlayerComponent:UpCharge(_DaggerSkill2.upChargeRate[1])
+	--    dmg = self.playerComponent.atkPoint^1.25 * _DaggerSkill2.coefficient[1]
+	--else	
+	--    dmg = self.playerComponent.atkPoint^1.25
+	--end
 	
 	if attackInfo == nil then
 		dmg = self.playerComponent.atkPoint^1.25
 	
-	elseif attackInfo == "sw2-2" then
-		_EffectService:PlayEffect(_SwordSkill2.hitEffectRUID[2], attacker.Parent, defender.TransformComponent.Position, 0, Vector3.one, false)
-		_SoundService:PlaySound(_SwordSkill2.hitSoundRUID[2], 1.0, attacker.Name)
-		self.playerComponent:UpCharge(_SwordSkill2.upChargeRate[2])
-		dmg = self.playerComponent.atkPoint^1.25 * _SwordSkill2.coefficient[2]
-		
-	elseif attackInfo == "sw4-2" then
-		_EffectService:PlayEffect(_SwordSkill4.hitEffectRUID[2], attacker.Parent, defender.TransformComponent.Position, 0, Vector3.one, false)
-		_SoundService:PlaySound(_SwordSkill4.hitSoundRUID[2], 1.0, attacker.Name)
-		self.playerComponent:UpCharge(_SwordSkill4.upChargeRate[2])
-		dmg = self.playerComponent.atkPoint^1.25 * _SwordSkill4.coefficient[2]
-		
-	elseif attackInfo == "sw4-3" then 
-		_EffectService:PlayEffect(_SwordSkill4.hitEffectRUID[3], attacker.Parent, defender.TransformComponent.Position, 0, Vector3.one, false)
-		_SoundService:PlaySound(_SwordSkill4.hitSoundRUID[3], 1.0, attacker.Name)
-		attacker.ExtendPlayerComponent:UpCharge(_SwordSkill4.upChargeRate[3])
-		dmg = self.playerComponent.atkPoint^1.25 * _SwordSkill4.coefficient[3]
-		
 	else
-		local skill = _SkillManager.skillDictionary["sword"][attackInfo]
+		local skill = _SkillManager.skillDictionary["dagger"][attackInfo]
 		_EffectService:PlayEffect(skill.hitEffectRUID[1], attacker.Parent, defender.TransformComponent.Position, 0, Vector3.one, false)
 		_SoundService:PlaySound(skill.hitSoundRUID[1], 1.0, attacker.Name)
 		self.playerComponent:UpCharge(skill.upChargeRate[1])
@@ -79,8 +74,8 @@ number GetCriticalDamageRate()
 [Default]
 int32 GetDisplayHitCount(string attackInfo)
 {
-	if attackInfo == "sw4-2" or attackInfo == "sw6" then return 3 
-	elseif attackInfo == "swU" then return 6 end
+	if attackInfo == "dg2" then return 6 
+	elseif attackInfo == "dg3" then return 9 end
 	return __base:GetDisplayHitCount(attackInfo)
 }
 

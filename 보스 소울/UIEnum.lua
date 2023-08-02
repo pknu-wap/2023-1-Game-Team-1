@@ -4,6 +4,7 @@ integer Inventory = 1
 integer Enhance = 2
 integer EquipCraft = 3
 integer BossSelect = 4
+integer Skill = 5
 integer Left = 1
 integer Right = 2
 integer EquipInfo = 1

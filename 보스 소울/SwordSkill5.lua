@@ -1,6 +1,7 @@
 --Properties--
 
 string skillName = "sw5"
+string class = "sword"
 string modelId = ""
 
 
@@ -9,11 +10,7 @@ string modelId = ""
 [Default]
 void OnBeginPlay()
 {
-	if self:IsClient() then
-		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
-		self.stateComponent = _UserService.LocalPlayer.StateComponent
-		self.hitComponent = _UserService.LocalPlayer.PlayerHit
-	end
+	__base:OnBeginPlay()
 	
 	local skillData = _DataService:GetTable("SwordSkillData")
 	local row = skillData:FindRow("Name", self.skillName)
@@ -21,6 +18,7 @@ void OnBeginPlay()
 	local attackSizeY = _DataSetToTable:GetNumberTable(row:GetItem("AttackSize.y"))
 	local attackOffsetX = _DataSetToTable:GetNumberTable(row:GetItem("AttackOffset.x"))
 	local attackOffsetY = _DataSetToTable:GetNumberTable(row:GetItem("AttackOffset.y"))
+	
 	self.coefficient = _DataSetToTable:GetNumberTable(row:GetItem("Coefficient"))
 	self.upChargeRate = _DataSetToTable:GetNumberTable(row:GetItem("UpChargeRate"))
 	self.startDelay = tonumber(row:GetItem("StartDelay"))

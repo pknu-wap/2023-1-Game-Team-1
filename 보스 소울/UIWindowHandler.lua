@@ -5,6 +5,7 @@ Entity inventory
 Entity enhance
 Entity equipCraft
 Entity bossSelect
+Entity skill
 Component title
 Entity exitButton
 table pages
@@ -24,7 +25,7 @@ void OnBeginPlay()
 	local enhance = _UIEnum.Enhance
 	local equipCraft = _UIEnum.EquipCraft
 	local bossSelect = _UIEnum.BossSelect
-	
+	local skill = _UIEnum.Skill
 	
 	local left = _UIEnum.Left
 	local right = _UIEnum.Right
@@ -33,6 +34,7 @@ void OnBeginPlay()
 	self.pages[enhance] = self.enhance
 	self.pages[equipCraft] = self.equipCraft
 	self.pages[bossSelect] = self.bossSelect
+	self.pages[skill] = self.skill
 	
 	self.taps[inventory] = {}
 	self.taps[enhance] = {}

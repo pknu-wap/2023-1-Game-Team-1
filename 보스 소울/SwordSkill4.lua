@@ -1,6 +1,7 @@
 --Properties--
 
 string skillName = "sw4"
+string class = "sword"
 Component rigidbodyComponent
 Component controllerComponent
 
@@ -10,13 +11,7 @@ Component controllerComponent
 [Default]
 void OnBeginPlay()
 {
-	if self:IsClient() then 
-	    self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
-	    self.stateComponent = _UserService.LocalPlayer.StateComponent
-	    self.rigidbodyComponent = _UserService.LocalPlayer.RigidbodyComponent
-	    self.controllerComponent = _UserService.LocalPlayer.PlayerControllerComponent
-	    self.hitComponent = _UserService.LocalPlayer.PlayerHit
-	end
+	__base:OnBeginPlay()
 	
 	local skillData = _DataService:GetTable("SwordSkillData")
 	local row = skillData:FindRow("Name", self.skillName)
@@ -76,7 +71,7 @@ void UseSkillServer(Entity player, number delay)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
 	_EffectService:PlayEffectAttached(self.effectRUID[1], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
-	player.AttackComponent:Attack(self.attackSize[1], self.attackOffset[1] * player.PlayerControllerComponent.LookDirectionX, "sw4-1", CollisionGroups.Monster)
+	player.AttackComponent:Attack(self.attackSize[1], self.attackOffset[1] * player.PlayerControllerComponent.LookDirectionX, self.skillName, CollisionGroups.Monster)
 }
 
 [Server]
@@ -84,7 +79,7 @@ void UseSkillServer2(Entity player, number delay)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
 	_EffectService:PlayEffectAttached(self.effectRUID[2], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
-	player.AttackComponent:Attack(self.attackSize[2], self.attackOffset[2] * player.PlayerControllerComponent.LookDirectionX, "sw4-2", CollisionGroups.Monster)
+	player.AttackComponent:Attack(self.attackSize[2], self.attackOffset[2] * player.PlayerControllerComponent.LookDirectionX, self.skillName.."-2", CollisionGroups.Monster)
 }
 
 [Server]
@@ -93,7 +88,7 @@ void UseSkillServer3(Entity player, number delay)
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
 	_EffectService:PlayEffectAttached(self.effectRUID[3], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
 	_TimerService:SetTimerOnce(function()
-			player.AttackComponent:Attack(self.attackSize[3], self.attackOffset[3] * player.PlayerControllerComponent.LookDirectionX, "sw4-3", CollisionGroups.Monster)
+			player.AttackComponent:Attack(self.attackSize[3], self.attackOffset[3] * player.PlayerControllerComponent.LookDirectionX, self.skillName.."-3", CollisionGroups.Monster)
 		end, delay)
 }
 

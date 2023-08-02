@@ -1,6 +1,7 @@
 --Properties--
 
-integer slotCnt = 30
+integer HP = 1
+integer MP = 2
 
 
 --Methods--

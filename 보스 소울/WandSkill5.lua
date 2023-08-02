@@ -1,6 +1,7 @@
 --Properties--
 
 string skillName = "wa5"
+string class = "wand"
 
 
 --Methods--
@@ -8,11 +9,7 @@ string skillName = "wa5"
 [Default]
 void OnBeginPlay()
 {
-	if self:IsClient() then
-		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
-		self.stateComponent = _UserService.LocalPlayer.StateComponent
-		self.hitComponent = _UserService.LocalPlayer.PlayerHit
-	end
+	__base:OnBeginPlay()
 	
 	local skillData = _DataService:GetTable("WandSkillData")
 	local row = skillData:FindRow("Name", self.skillName)
@@ -52,7 +49,7 @@ void UseSkillServer(Entity player, number delay)
 	_EffectService:PlayEffectAttached(self.effectRUID[1], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
 	_EffectService:PlayEffectAttached(self.effectRUID[2], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
 	_TimerService:SetTimerOnce(function() 	
-		player.AttackComponent:Attack(self.attackSize[1], self.attackOffset[1] * player.PlayerControllerComponent.LookDirectionX, "wa5", CollisionGroups.Monster)
+		player.AttackComponent:Attack(self.attackSize[1], self.attackOffset[1] * player.PlayerControllerComponent.LookDirectionX, self.skillName, CollisionGroups.Monster)
 	end, delay)
 }
 

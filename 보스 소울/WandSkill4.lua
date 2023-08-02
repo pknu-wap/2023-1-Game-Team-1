@@ -1,6 +1,7 @@
 --Properties--
 
 string skillName = "wa4"
+string class = "wand"
 string modelId = ""
 
 
@@ -9,11 +10,7 @@ string modelId = ""
 [Default]
 void OnBeginPlay()
 {
-	if self:IsClient() then
-		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
-		self.stateComponent = _UserService.LocalPlayer.StateComponent
-		self.hitComponent = _UserService.LocalPlayer.PlayerHit
-	end
+	__base:OnBeginPlay()
 	
 	local skillData = _DataService:GetTable("WandSkillData")
 	local row = skillData:FindRow("Name", self.skillName)

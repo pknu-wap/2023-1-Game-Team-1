@@ -8,7 +8,8 @@ Entity ui
 [Client]
 void ShowUI()
 {
-	self.ui.Enable = true
+	--self.ui.Enable = true
+	_UIWindowHandler:OpenWindow(_UIEnum.BossSelect, nil, nil)
 }
 
 

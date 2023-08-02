@@ -1,9 +1,12 @@
 --Properties--
 
 string skillName = ""
+string class = ""
 Component playerComponent
 Component stateComponent
 Component hitComponent
+Component rigidbodyComponent
+Component controllerComponent
 table coefficient
 table upChargeRate
 number startDelay = 0
@@ -29,7 +32,13 @@ boolean isSkillReady = true
 [Default]
 void OnBeginPlay()
 {
-	
+	if self:IsClient() then
+		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
+		self.stateComponent = _UserService.LocalPlayer.StateComponent
+		self.hitComponent = _UserService.LocalPlayer.PlayerHit
+		self.rigidbodyComponent = _UserService.LocalPlayer.RigidbodyComponent
+		self.controllerComponent = _UserService.LocalPlayer.PlayerControllerComponent
+	end
 }
 
 [Client]

@@ -2,10 +2,17 @@
 
 table slots
 dictionary<number, string> classes
-number NewValue1 = 0
 
 
 --Methods--
+
+[Client Only]
+void OnBeginPlay()
+{
+	local data = _DataService:GetTable(_DataSetEnum.EquipDataSet)
+	
+	
+}
 
 
 --Events--

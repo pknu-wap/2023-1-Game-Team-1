@@ -1,7 +1,7 @@
 --Properties--
 
-string skillName = "waU"
-string modelId = ""
+string skillName = "wa7"
+string class = "wand"
 
 
 --Methods--
@@ -9,11 +9,7 @@ string modelId = ""
 [Default]
 void OnBeginPlay()
 {
-	if self:IsClient() then
-		self.playerComponent = _UserService.LocalPlayer.ExtendPlayerComponent
-		self.stateComponent = _UserService.LocalPlayer.StateComponent
-		self.hitComponent = _UserService.LocalPlayer.PlayerHit
-	end
+	__base:OnBeginPlay()
 	
 	local skillData = _DataService:GetTable("WandSkillData")
 	local row = skillData:FindRow("Name", self.skillName)
@@ -33,7 +29,6 @@ void OnBeginPlay()
 	self.hitEffectRUID = _DataSetToTable:GetStringTable(row:GetItem("HitEffectRUID"))
 	self.soundRUID = _DataSetToTable:GetStringTable(row:GetItem("SoundRUID"))
 	self.hitSoundRUID = _DataSetToTable:GetStringTable(row:GetItem("HitSoundRUID"))
-	self.modelId = row:GetItem("Option")
 }
 
 [Client]
@@ -60,16 +55,16 @@ void UseSkillServer(Entity player, number delay)
 {
 	local flip = player.PlayerControllerComponent.LookDirectionX > 0
 	local Position = player.TransformComponent.Position
-	_EffectService:PlayEffectAttached(self.effectRUID[1], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
+	_EffectService:PlayEffectAttached(self.effectRUID[2], player, Vector3.zero, 0, Vector3.one, false, {FlipX = flip, PlayRate = player.ExtendPlayerComponent.atkSpeed})
 	_TimerService:SetTimerOnce(function()
-			player.AttackComponent:Attack(self.attackSize[1], self.attackOffset[1], "waU-Buff", CollisionGroups.Player)
+			player.AttackComponent:Attack(self.attackSize[2], self.attackOffset[2], self.skillName, CollisionGroups.Player)
 		end, delay)
 	local attack = function(offset)
-		_EffectService:PlayEffect(self.effectRUID[2], player.Parent, Vector3(Position.x + offset, Position.y, Position.z), 0, Vector3.one, false, {PlayRate = player.ExtendPlayerComponent.atkSpeed})
-		_EffectService:PlayEffect(self.effectRUID[2], player.Parent, Vector3(Position.x - offset, Position.y, Position.z), 0, Vector3.one, false, {PlayRate = player.ExtendPlayerComponent.atkSpeed})
+		_EffectService:PlayEffect(self.effectRUID[1], player.Parent, Vector3(Position.x + offset, Position.y, Position.z), 0, Vector3.one, false, {PlayRate = player.ExtendPlayerComponent.atkSpeed})
+		_EffectService:PlayEffect(self.effectRUID[1], player.Parent, Vector3(Position.x - offset, Position.y, Position.z), 0, Vector3.one, false, {PlayRate = player.ExtendPlayerComponent.atkSpeed})
 		_TimerService:SetTimerOnce(function()
-				player.AttackComponent:AttackFrom(self.attackSize[2], Vector2(Position.x + offset, Position.y + 2), "waU-Attack", CollisionGroups.Monster)
-				player.AttackComponent:AttackFrom(self.attackSize[2], Vector2(Position.x - offset, Position.y + 2), "waU-Attack", CollisionGroups.Monster)
+				player.AttackComponent:AttackFrom(self.attackSize[1], Vector2(Position.x + offset, Position.y + 2), self.skillName, CollisionGroups.Monster)
+				player.AttackComponent:AttackFrom(self.attackSize[1], Vector2(Position.x - offset, Position.y + 2), self.skillName, CollisionGroups.Monster)
 			end, delay)
 	end
 	_TimerService:SetTimerOnce(function() attack(1.5) end, delay / 2)

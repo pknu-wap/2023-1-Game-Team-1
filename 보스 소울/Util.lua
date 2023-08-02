@@ -37,6 +37,14 @@ string Comma(string num)
 	return ret
 }
 
+[Default]
+string ClassIdxToString(integer class)
+{
+	local classArr = {"sword", "wand", "dagger", "bow"}
+	
+	return classArr[class]
+}
+
 
 --Events--
 

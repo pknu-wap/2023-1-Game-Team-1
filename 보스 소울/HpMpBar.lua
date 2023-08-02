@@ -6,7 +6,6 @@ Component mpBar
 number maxWidth = 0
 Component hpText
 Component mpText
-Component upText
 
 
 --Methods--
@@ -19,7 +18,6 @@ void OnBeginPlay()
 	
 	self.hpText = _EntityService:GetEntityByPath(currentPath .. "/HP/Num").TextComponent
 	self.mpText = _EntityService:GetEntityByPath(currentPath .. "/MP/Num").TextComponent
-	self.upText = _EntityService:GetEntityByPath(currentPath .. "/UP").TextComponent
 	
 	self.hpBar = _EntityService:GetEntityByPath(currentPath .. "/HP/Fill").UITransformComponent
 	self.mpBar = _EntityService:GetEntityByPath(currentPath .. "/MP/Fill").UITransformComponent
@@ -41,10 +39,6 @@ void OnUpdate(number delta)
 		local maxmp = self.playerComponent.MaxMp
 		self.mpBar.RectSize = Vector2(mp / maxmp * self.maxWidth,self.mpBar.RectSize.y)
 		self.mpText.Text = string.format("%d / %d", mp,maxmp)
-	end
-	
-	if self.upText ~= nil then
-		self.upText.Text = tostring(self.playerComponent.Up)
 	end
 }
 

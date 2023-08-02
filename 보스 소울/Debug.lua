@@ -105,7 +105,7 @@ void SoulCopy()
 [Client Only]
 void TmpPlayerSetting()
 {
-	_EnhanceClient:UpdateUI()
+	_HUDClient:SetSkillCoolTime()
 }
 
 [Client Only]
@@ -123,8 +123,7 @@ void OpenInventoryPage()
 [Client]
 void AddEnforceStone()
 {
-	_InventoryServer:AddResource(self.userId, _ItemTypeEnum.EnforceStone, self.stoneValue)
-	_EnhanceClient:UpdateUI()
+	_UIWindowHandler:OpenWindow(_UIEnum.Skill, nil, nil)
 }
 
 [Client]

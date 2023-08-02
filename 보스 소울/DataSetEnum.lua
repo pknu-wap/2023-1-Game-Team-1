@@ -23,15 +23,22 @@ string EnforceDataSet = "EnforceDataSet"
 string EquipDataSet = "EquipDataSet"
 string ScrollDataSet = "ScrollDataSet"
 string MaterialDataSet = "MaterialDataSet"
-string BossDifficultDataSet = "BossDifficultDataSet"
+string BossDetailDataSet = "BossDifficultDataSet"
 string BossDataSet = "BossDataSet"
+string ExpDataSet = "ExpDataSet"
+string SkillClassDataSet = "SkillClassDataSet"
 array<string> EquipDataSetKeys
 integer EquipDataStartNum = 10000
+string HeroSkillDataSet = "SwordSkillData"
+string BishopSkillDataSet = "WandSkillData"
+string ShadowerSkillDataSet = "DaggerSkillData"
+dictionary<integer, string> SkillDataSet
+number NewValue1 = 0
 
 
 --Methods--
 
-[Server Only]
+[Client Only]
 void OnBeginPlay()
 {
 	self.EquipDataSetKeys[1] = self.Code
@@ -43,6 +50,9 @@ void OnBeginPlay()
 	self.EquipDataSetKeys[7] = self.Img
 	self.EquipDataSetKeys[8] = self.Description
 	
+	self.SkillDataSet[_ClassEnum.Sword] = self.HeroSkillDataSet
+	self.SkillDataSet[_ClassEnum.Wand] = self.BishopSkillDataSet
+	self.SkillDataSet[_ClassEnum.Dagger] = self.ShadowerSkillDataSet
 }
 
 

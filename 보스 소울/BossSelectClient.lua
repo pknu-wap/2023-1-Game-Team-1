@@ -20,6 +20,12 @@ Entity startButton
 [Client Only]
 void OnBeginPlay()
 {
+	
+}
+
+[Client]
+void Init()
+{
 	-- 보스 슬롯
 	---@type table<Entity>
 	local bossTable = {
@@ -74,6 +80,7 @@ void OnBeginPlay()
 	
 	-- Enum 비우기
 	_BossSelectEnum:SetNull()
+	self:BossClicked(1)
 }
 
 [Client]
@@ -147,7 +154,7 @@ void BossInfo()
 	local bossNum = ((boss - 1) * 3) + diff
 	
 	local bossRow = _DataService:GetTable(_DataSetEnum.BossDataSet):GetRow(boss)
-	local bossDifficultRow = _DataService:GetTable(_DataSetEnum.BossDifficultDataSet):GetRow(bossNum)
+	local bossDifficultRow = _DataService:GetTable(_DataSetEnum.BossDetailDataSet):GetRow(bossNum)
 	
 	local bossName = bossRow:GetItem(_BossSelectEnum.Name)
 	local bossImg = bossRow:GetItem(_BossSelectEnum.Img)
@@ -174,6 +181,7 @@ void StartBoss()
 {
 	-- 해당 플레이어가 이 보스, 이 난이도를 도전할 수 있는지 확인 하기
 	-- 방찾기 코드 짜기
+	_BossSelectServer:EnterDungeon(self.currentBoss, _UserService.LocalPlayer.Name)
 }
 
 
